@@ -1,0 +1,14 @@
+[Unit]
+Description=Emoji Pop background service
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/emoji-pop hide
+Restart=on-failure
+RestartSec=3s
+Slice=app-graphical.slice
+
+[Install]
+WantedBy=graphical-session.target

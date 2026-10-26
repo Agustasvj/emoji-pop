@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "emoji-pop"
+version = "1.0.0"
+description = "A Lightweight, Windows-Style Emoji Picker for Pop!_OS and COSMIC"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Pop!_OS Engineering Team"}
+]
+keywords = ["emoji", "picker", "cosmic", "pop-os", "wayland", "gtk4"]
+classifiers = [
+    "Environment :: X11 Applications :: GTK",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Desktop Environment",
+    "Topic :: Utilities"
+]
+dependencies = [
+    "PyGObject>=3.42.0",
+]
+
+[project.scripts]
+emoji-pop = "emoji_pop.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["emoji_pop*"]
+
+[tool.setuptools.package-data]
+emoji_pop = ["assets/*"]

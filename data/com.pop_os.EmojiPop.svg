@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#48B9C7"/>
+      <stop offset="100%" stop-color="#2D7B91"/>
+    </linearGradient>
+    <linearGradient id="faceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDE43"/>
+      <stop offset="100%" stop-color="#F7B519"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle -->
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)" filter="url(#dropShadow)"/>
+
+  <!-- Emoji Face -->
+  <circle cx="64" cy="64" r="38" fill="url(#faceGrad)"/>
+
+  <!-- Eyes -->
+  <ellipse cx="50" cy="54" rx="4.5" ry="6.5" fill="#3D2914"/>
+  <ellipse cx="78" cy="54" rx="4.5" ry="6.5" fill="#3D2914"/>
+  <circle cx="51.5" cy="52" r="1.5" fill="#FFFFFF"/>
+  <circle cx="79.5" cy="52" r="1.5" fill="#FFFFFF"/>
+
+  <!-- Smiling mouth -->
+  <path d="M 46 70 C 50 84, 78 84, 82 70 Z" fill="#3D2914"/>
+  <path d="M 52 70 C 56 78, 72 78, 76 70 Z" fill="#F05A5B"/>
+
+  <!-- Cheeks -->
+  <circle cx="41" cy="66" r="5" fill="#F88C64" opacity="0.6"/>
+  <circle cx="87" cy="66" r="5" fill="#F88C64" opacity="0.6"/>
+
+  <!-- Sparkle Accent (Pop!) -->
+  <path d="M 98 22 L 100 28 L 106 30 L 100 32 L 98 38 L 96 32 L 90 30 L 96 28 Z" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="28" cy="36" r="2.5" fill="#FFFFFF" opacity="0.8"/>
+  <circle cx="94" cy="98" r="3" fill="#FFFFFF" opacity="0.8"/>
+</svg>

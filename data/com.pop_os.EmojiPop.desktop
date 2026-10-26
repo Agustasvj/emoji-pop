@@ -1,0 +1,30 @@
+[Desktop Entry]
+Name=Emoji Pop
+GenericName=Emoji Picker
+Comment=Lightweight, Windows-style emoji picker for Pop!_OS and COSMIC
+Exec=emoji-pop toggle
+Icon=com.pop_os.EmojiPop
+Terminal=false
+Type=Application
+Categories=Utility;DesktopUtility;
+Keywords=emoji;picker;emoticon;kaomoji;symbols;insert;pop-os;cosmic;wayland;
+StartupNotify=false
+SingleMainWindow=true
+X-COSMIC-Applet=false
+Actions=Toggle;Show;Hide;Quit;
+
+[Desktop Action Toggle]
+Name=Toggle Picker
+Exec=emoji-pop toggle
+
+[Desktop Action Show]
+Name=Open Picker
+Exec=emoji-pop show
+
+[Desktop Action Hide]
+Name=Close Picker
+Exec=emoji-pop hide
+
+[Desktop Action Quit]
+Name=Quit Daemon
+Exec=emoji-pop quit

@@ -1,0 +1,217 @@
+/*
+ * Emoji Pop — Modern Windows 11 Inspired Styling for Pop!_OS & COSMIC
+ * Supports both dark and light modes cleanly with system accent integration.
+ */
+
+/* Main popup container */
+window.emoji-pop-window {
+    background-color: transparent;
+}
+
+.emoji-pop-card {
+    background-color: @window_bg_color;
+    border-radius: 14px;
+    border: 1px solid alpha(@window_fg_color, 0.12);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    padding: 0;
+    margin: 6px;
+}
+
+/* Header container */
+.emoji-pop-header {
+    padding: 10px 12px 6px 12px;
+    border-bottom: 1px solid alpha(@window_fg_color, 0.08);
+}
+
+/* Search entry styling */
+.emoji-pop-search {
+    border-radius: 10px;
+    font-size: 13.5px;
+    padding: 6px 10px;
+    background-color: alpha(@window_fg_color, 0.05);
+    border: 1px solid alpha(@window_fg_color, 0.08);
+    transition: all 120ms ease;
+}
+
+.emoji-pop-search:focus-within {
+    background-color: alpha(@window_fg_color, 0.08);
+    border-color: @accent_color;
+    box-shadow: 0 0 0 2px alpha(@accent_color, 0.25);
+}
+
+/* Close button '✕' */
+.close-window-btn {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: alpha(@window_fg_color, 0.6);
+    font-size: 13px;
+    font-weight: bold;
+    transition: all 100ms ease;
+}
+
+.close-window-btn:hover {
+    background-color: alpha(@window_fg_color, 0.1);
+    color: @window_fg_color;
+}
+
+/* Skin tone picker button & bar */
+.skin-tone-bar {
+    margin-left: 2px;
+    margin-right: 4px;
+}
+
+.skin-tone-btn {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 2px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 14px;
+}
+
+.skin-tone-btn:hover {
+    background-color: alpha(@window_fg_color, 0.1);
+}
+
+.skin-tone-btn.active {
+    border-color: @accent_color;
+    background-color: alpha(@accent_color, 0.2);
+}
+
+/* Category navigation bar */
+.category-bar {
+    padding: 6px 10px;
+    border-bottom: 1px solid alpha(@window_fg_color, 0.08);
+    background-color: alpha(@window_fg_color, 0.02);
+}
+
+.category-tab-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: alpha(@window_fg_color, 0.75);
+    transition: all 120ms ease;
+    font-size: 15px;
+}
+
+.category-tab-btn:hover {
+    background-color: alpha(@window_fg_color, 0.08);
+    color: @window_fg_color;
+}
+
+.category-tab-btn.active {
+    background-color: alpha(@accent_color, 0.18);
+    color: @accent_color;
+    font-weight: bold;
+}
+
+/* Scrolled content area */
+.emoji-scroll-area {
+    padding: 6px;
+    background: transparent;
+}
+
+/* FlowBox container */
+.emoji-flowbox {
+    background: transparent;
+}
+
+.emoji-flowbox > flowboxchild {
+    padding: 0;
+    margin: 1px;
+    border-radius: 8px;
+    background: transparent;
+    transition: background 80ms ease;
+}
+
+.emoji-flowbox > flowboxchild:hover {
+    background-color: alpha(@window_fg_color, 0.1);
+}
+
+.emoji-flowbox > flowboxchild:selected,
+.emoji-flowbox > flowboxchild:focus {
+    background-color: alpha(@accent_color, 0.2);
+    outline: 2px solid @accent_color;
+    outline-offset: -1px;
+}
+
+/* Emoji button item */
+.emoji-item-btn {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 2px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-family: "Noto Color Emoji", sans-serif;
+    font-size: 22px;
+}
+
+/* Kaomoji item */
+.kaomoji-item-btn {
+    min-height: 34px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid alpha(@window_fg_color, 0.08);
+    background-color: alpha(@window_fg_color, 0.04);
+    font-size: 13.5px;
+}
+
+.kaomoji-item-btn:hover {
+    background-color: alpha(@window_fg_color, 0.12);
+}
+
+/* Empty search state */
+.empty-state-box {
+    padding: 36px 16px;
+}
+
+.empty-state-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    opacity: 0.6;
+}
+
+.empty-state-title {
+    font-weight: 600;
+    font-size: 14.5px;
+    margin-bottom: 4px;
+}
+
+.empty-state-subtitle {
+    font-size: 12.5px;
+    color: alpha(@window_fg_color, 0.6);
+}
+
+/* Footer status & hint bar */
+.emoji-pop-footer {
+    min-height: 30px;
+    max-height: 30px;
+    padding: 4px 12px;
+    border-top: 1px solid alpha(@window_fg_color, 0.08);
+    background-color: alpha(@window_fg_color, 0.02);
+    font-size: 11.5px;
+    color: alpha(@window_fg_color, 0.65);
+}
+
+.footer-status-label {
+    font-weight: 500;
+}
+
+.footer-key-hint {
+    background-color: alpha(@window_fg_color, 0.08);
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin: 0 2px;
+    font-size: 10.5px;
+    font-family: monospace;
+    font-weight: 600;
+}
