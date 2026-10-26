@@ -7,8 +7,18 @@ import gi
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk
 
-from emoji_pop.data import CATEGORY_INFO, get_emoji_db
+from emoji_pop.data import CATEGORY_INFO
 from emoji_pop.storage import get_storage
+
+# Sleek Fitzpatrick skin tone swatches with hex color circles
+SKIN_TONE_CONFIG = [
+    {"code": "", "color_class": "skin-tone-dot-default", "color": "#FFD234", "name": "Default"},
+    {"code": "\U0001F3FB", "color_class": "skin-tone-dot-light", "color": "#FADCBC", "name": "Light"},
+    {"code": "\U0001F3FC", "color_class": "skin-tone-dot-med-light", "color": "#E0BB95", "name": "Medium-Light"},
+    {"code": "\U0001F3FD", "color_class": "skin-tone-dot-medium", "color": "#BF8F68", "name": "Medium"},
+    {"code": "\U0001F3FE", "color_class": "skin-tone-dot-med-dark", "color": "#9B643D", "name": "Medium-Dark"},
+    {"code": "\U0001F3FF", "color_class": "skin-tone-dot-dark", "color": "#5A3825", "name": "Dark"},
+]
 
 
 class CategoryBar(Gtk.Box):
@@ -22,7 +32,6 @@ class CategoryBar(Gtk.Box):
 
         self.add_css_class("category-bar")
 
-        # Scrollable container in case of small window
         scroll = Gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         scroll.set_hexpand(True)
@@ -34,6 +43,7 @@ class CategoryBar(Gtk.Box):
             btn = Gtk.Button(label=cat["symbol"])
             btn.set_tooltip_text(cat["title"])
             btn.add_css_class("category-tab-btn")
+            btn.set_focus_on_click(False)
             btn.connect("clicked", self._on_button_clicked, cat_id)
 
             self._buttons[cat_id] = btn
@@ -55,25 +65,31 @@ class CategoryBar(Gtk.Box):
 
 
 class SkinToneBar(Gtk.Box):
-    """Compact Fitzpatrick skin tone selector row."""
+    """Sleek circular color swatch skin tone selector."""
 
     def __init__(self, on_tone_changed: Callable[[str], None]):
-        super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
+        super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
         self.on_tone_changed = on_tone_changed
         self._buttons = {}
         self._active_code = ""
 
         self.add_css_class("skin-tone-bar")
 
-        db = get_emoji_db()
-        for tone_info in db.skin_tones:
-            code = tone_info["code"]
-            sample = tone_info["sample"]
-            name = tone_info["name"]
+        for tone in SKIN_TONE_CONFIG:
+            code = tone["code"]
+            name = tone["name"]
 
-            btn = Gtk.Button(label=sample)
+            btn = Gtk.Button()
             btn.set_tooltip_text(f"Skin Tone: {name}")
             btn.add_css_class("skin-tone-btn")
+            btn.set_focus_on_click(False)
+
+            # Circular color swatch dot
+            dot = Gtk.Box()
+            dot.add_css_class("skin-tone-dot")
+            dot.add_css_class(tone["color_class"])
+            btn.set_child(dot)
+
             btn.connect("clicked", self._on_button_clicked, code)
 
             self._buttons[code] = btn

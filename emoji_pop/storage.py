@@ -14,11 +14,11 @@ logger = logging.getLogger("emoji_pop.storage")
 DEFAULT_CONFIG: Dict[str, Any] = {
     "shortcut": "Super+period",
     "insertion_mode": "auto",       # "auto", "clipboard_paste" (wl-copy + Ctrl+V), "direct", "copy_only"
-    "close_on_select": True,        # Directly insert into active text box on select
+    "close_on_select": True,        # Direct addition closes window on selection
     "skin_tone": "",                # "", "\U0001F3FB", etc.
     "max_recent": 40,
     "restore_clipboard": False,
-    "typing_delay_ms": 60,
+    "typing_delay_ms": 70,
     "theme": "system",              # "system", "dark", "light"
 }
 

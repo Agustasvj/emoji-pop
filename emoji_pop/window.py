@@ -1,7 +1,7 @@
 """
 Main application window for Emoji Pop.
-Windows 11 inspired floating popup with native COSMIC frosted glass aesthetic,
-undecorated unified card, direct emoji insertion on click, and auto-dismiss on click outside.
+Frameless, translucent floating popup that directly inserts selected emojis
+into the active text box with zero intermediate clicks.
 """
 
 import os
@@ -20,13 +20,14 @@ from emoji_pop.insertion import InsertionBackend
 
 
 class EmojiPopWindow(Gtk.ApplicationWindow):
-    """Floating emoji popup window."""
+    """Frameless translucent floating emoji popup window."""
 
     def __init__(self, app: Gtk.Application):
         super().__init__(application=app, title="Emoji Pop")
         self.set_default_size(380, 460)
         self.set_resizable(False)
-        # Undecorated window: removes the redundant OS titlebar with "Emoji Pop" and minimize/close buttons
+
+        # Remove window titlebar & window decorations completely
         self.set_decorated(False)
         self.add_css_class("emoji-pop-window")
 
@@ -41,13 +42,13 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         self._active_category = self.storage.get_last_category()
         self._search_timer_id = 0
         self._base_status_text = ""
-        self._is_inserting = False
+        self._is_dismissing = False
 
-        # Outer card container with frosted glass effect
+        # Outer card container
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         card.add_css_class("emoji-pop-card")
 
-        # 1. Header (Search entry + Skin tone selector + Subtle close button)
+        # 1. Header (Search entry + Circular Skin tone swatches + Close button)
         header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         header_box.add_css_class("emoji-pop-header")
 
@@ -59,7 +60,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         self.skin_tone_bar = SkinToneBar(on_tone_changed=self._on_skin_tone_changed)
 
-        # Subtle close button '✕'
+        # Close button '✕'
         close_btn = Gtk.Button(label="✕")
         close_btn.set_tooltip_text("Close (Esc)")
         close_btn.add_css_class("close-window-btn")
@@ -81,7 +82,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         # 4. Footer (Fixed height to prevent any layout jerking/flickering)
         footer_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        footer_box.set_size_request(-1, 28)
+        footer_box.set_size_request(-1, 30)
         footer_box.add_css_class("emoji-pop-footer")
 
         self.status_label = Gtk.Label(label="Emoji Pop")
@@ -135,7 +136,6 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         shift_held = bool(state & Gdk.ModifierType.SHIFT_MASK)
 
         if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
-            # Select top result and directly insert
             selected = self.grid.select_first(copy_only=shift_held)
             return selected
         elif keyval == Gdk.KEY_Down:
@@ -143,9 +143,14 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         return False
 
     def _on_window_active_changed(self, window, param):
-        """Auto-dismiss when clicking outside the window without selecting an emoji."""
-        if not self.is_active() and self.get_visible() and not self._is_inserting:
+        """Auto-dismiss when clicking outside the window."""
+        if not self.is_active() and self.get_visible() and not self._is_dismissing:
+            GLib.timeout_add(60, self._handle_outside_click)
+
+    def _handle_outside_click(self) -> bool:
+        if not self.is_active() and self.get_visible() and not self._is_dismissing:
             self.set_visible(False)
+        return False
 
     def _on_search_changed(self, entry: Gtk.SearchEntry):
         """Debounced search to ensure snappy typing with zero flicker."""
@@ -153,7 +158,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
             GLib.source_remove(self._search_timer_id)
             self._search_timer_id = 0
 
-        self._search_timer_id = GLib.timeout_add(60, self._execute_search)
+        self._search_timer_id = GLib.timeout_add(50, self._execute_search)
 
     def _execute_search(self) -> bool:
         self._search_timer_id = 0
@@ -239,44 +244,44 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_emoji_selected(self, emoji_char: str, copy_only: bool = False):
         """
-        Directly insert selected emoji into the active text box.
-        1. Updates recent history.
-        2. Copies emoji into Wayland clipboard.
-        3. Hides picker window immediately so target application regains focus.
-        4. Simulates Ctrl+V to paste the emoji directly into the active text box.
+        DIRECT EMOJI INSERTION:
+        1. Save to recent history.
+        2. Copy exact UTF-8 emoji to Wayland clipboard.
+        3. Immediately hide the picker window.
+        4. Focus returns to the active text field.
+        5. Simulate Ctrl+V to directly paste the emoji at the cursor!
         """
-        if self._is_inserting:
+        if self._is_dismissing:
             return
-        self._is_inserting = True
+        self._is_dismissing = True
 
         # 1. Update recent history
         self.storage.add_recent(emoji_char)
 
-        # 2. Put emoji into clipboard with wl-copy
+        # 2. Always copy to clipboard
         self.insertion.copy_to_clipboard(emoji_char)
 
-        # 3. Immediately hide window so compositor restores focus to the user's text box
+        # 3. Hide window immediately so compositor restores focus to the active text box
         self.set_visible(False)
 
-        # 4. If copy_only (Shift held), do not simulate paste
+        # 4. If copy_only requested (e.g. Shift held)
         if copy_only:
-            self._is_inserting = False
+            self._is_dismissing = False
             return
 
-        # 5. Yield focus to previous active window, then simulate Ctrl+V
-        delay_ms = self.storage.config.get("typing_delay_ms", 60)
+        # 5. Direct addition: paste into the active text box
+        delay_ms = self.storage.config.get("typing_delay_ms", 70)
 
-        def do_paste():
-            # Focused target application receives Ctrl+V and pastes the emoji directly
+        def do_direct_paste():
             self.insertion.simulate_paste()
-            self._is_inserting = False
+            self._is_dismissing = False
             return False
 
-        GLib.timeout_add(delay_ms, do_paste)
+        GLib.timeout_add(delay_ms, do_direct_paste)
 
     def present_window(self):
         """Show and focus window when shortcut or command is triggered."""
-        self._is_inserting = False
+        self._is_dismissing = False
         self.set_visible(True)
         self.present()
         self.search_entry.set_text("")
