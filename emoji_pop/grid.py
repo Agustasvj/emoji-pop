@@ -13,6 +13,27 @@ from emoji_pop.data import EmojiItem, get_emoji_db
 from emoji_pop.storage import get_storage
 
 
+class FixedEmojiChild(Gtk.Widget):
+    """Container widget that strictly limits measured dimensions to 32x32 for emoji items."""
+    def __init__(self, child: Gtk.Widget):
+        super().__init__()
+        self.set_overflow(Gtk.Overflow.HIDDEN)
+        self._child = child
+        child.set_parent(self)
+
+    def do_measure(self, orientation, for_size):
+        return (32, 32, -1, -1)
+
+    def do_size_allocate(self, width, height, baseline):
+        if self._child:
+            self._child.allocate(width, height, baseline, None)
+
+    def do_dispose(self):
+        if self._child:
+            self._child.unparent()
+            self._child = None
+
+
 class EmojiGrid(Gtk.Box):
     """Zero-flicker stack-based emoji and kaomoji grid."""
 
@@ -70,7 +91,7 @@ class EmojiGrid(Gtk.Box):
         self.search_flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         self.search_flowbox.set_valign(Gtk.Align.START)
         self.search_flowbox.set_homogeneous(True)
-        self.search_flowbox.set_min_children_per_line(8)
+        self.search_flowbox.set_min_children_per_line(9)
         self.search_flowbox.set_max_children_per_line(9)
         self.search_flowbox.add_css_class("emoji-flowbox")
 
@@ -96,7 +117,7 @@ class EmojiGrid(Gtk.Box):
             flowbox.set_max_children_per_line(3)
         else:
             flowbox.set_homogeneous(True)
-            flowbox.set_min_children_per_line(8)
+            flowbox.set_min_children_per_line(9)
             flowbox.set_max_children_per_line(9)
 
         flowbox.connect("child-activated", self._on_flowbox_child_activated)
@@ -156,7 +177,10 @@ class EmojiGrid(Gtk.Box):
         for i, item in enumerate(results):
             if i < len(self._search_buttons):
                 btn = self._search_buttons[i]
-                btn.set_label(item.char)
+                if hasattr(btn, "_label") and btn._label:
+                    btn._label.set_text(item.char)
+                else:
+                    btn.set_label(item.char)
                 btn.set_tooltip_text(item.name)
                 btn._emoji_item = item
                 btn.get_parent().set_visible(True)
@@ -173,17 +197,22 @@ class EmojiGrid(Gtk.Box):
         self._search_scroll.get_vadjustment().set_value(0)
 
     def _make_emoji_button(self, item: EmojiItem, is_kaomoji: bool = False) -> Gtk.Button:
-        btn = Gtk.Button(label=item.char)
+        if is_kaomoji:
+            btn = Gtk.Button(label=item.char)
+            btn.add_css_class("kaomoji-item-btn")
+        else:
+            lbl = Gtk.Label(label=item.char)
+            fixed_child = FixedEmojiChild(lbl)
+            btn = Gtk.Button()
+            btn.set_child(fixed_child)
+            btn._label = lbl
+            btn.add_css_class("emoji-item-btn")
+
         btn.set_tooltip_text(item.name)
         btn._emoji_item = item
 
         # Do not steal focus from search entry on click
         btn.set_focus_on_click(False)
-
-        if is_kaomoji:
-            btn.add_css_class("kaomoji-item-btn")
-        else:
-            btn.add_css_class("emoji-item-btn")
 
         btn.connect("clicked", self._on_button_clicked)
 

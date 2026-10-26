@@ -109,37 +109,24 @@ class InsertionBackend:
     def simulate_paste(self, method: Optional[str] = None) -> bool:
         """
         Simulate paste keystroke into the active target application via wtype.
-        - "universal": Types Shift+Insert, which is standard CUA/X11 and works in BOTH
-          terminals (cosmic-term, alacritty, kitty, gnome-terminal) AND GUI apps (gedit,
-          browsers, LibreOffice, electron). Falls back to Ctrl+V if Shift+Insert fails.
-        - "ctrl_v": Types standard Ctrl+V.
-        - "ctrl_shift_v": Types Ctrl+Shift+V for terminals.
+        - Terminal emulators (cosmic-term, alacritty, kitty): sends Ctrl+Shift+V.
+        - GUI applications (gedit, Firefox, Chrome, LibreOffice, Code, etc.): sends Ctrl+V.
         """
         if not self._wtype_bin:
             return False
 
-        target_method = method or self.paste_method or "universal"
+        app_lower = (method or "").lower()
+        if not app_lower and hasattr(self, "paste_method") and self.paste_method:
+            app_lower = self.paste_method.lower()
 
-        if target_method == "universal":
-            try:
-                proc = subprocess.run(
-                    [self._wtype_bin, "-M", "shift", "-P", "Insert", "-p", "Insert", "-m", "shift"],
-                    stdin=subprocess.DEVNULL,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    timeout=1.0,
-                )
-                if proc.returncode == 0:
-                    return True
-            except Exception as e:
-                logger.warning("Universal Shift+Insert failed: %s", e)
+        is_terminal = any(term in app_lower for term in ("term", "kitty", "alacritty", "console"))
 
-            # Fallback to Ctrl+V
-            target_method = "ctrl_v"
-
-        if target_method == "ctrl_shift_v":
+        if method == "ctrl_shift_v" or is_terminal:
             args = [self._wtype_bin, "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "ctrl", "-m", "shift"]
+        elif method == "shift_insert":
+            args = [self._wtype_bin, "-M", "shift", "-P", "Insert", "-p", "Insert", "-m", "shift"]
         else:
+            # Standard Ctrl+V for all GUI applications, web browsers, and text fields
             args = [self._wtype_bin, "-M", "ctrl", "-k", "v", "-m", "ctrl"]
 
         try:

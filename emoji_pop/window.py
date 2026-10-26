@@ -25,7 +25,8 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def __init__(self, app: Gtk.Application):
         super().__init__(application=app, title="Emoji Pop")
-        self.set_default_size(380, 460)
+        self.set_default_size(350, 410)
+        self.set_size_request(350, 410)
         self.set_resizable(False)
 
         # Remove window titlebar & window decorations completely
@@ -47,13 +48,15 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         self._base_status_text = ""
         self._is_inserting = False
         self._user_closed = False
+        self._last_insert_time = 0
 
         # Outer card container
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         card.add_css_class("emoji-pop-card")
+        card.set_size_request(350, 410)
 
         # 1. Header (Search entry + Circular Skin tone swatches + Close button)
-        header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
         header_box.add_css_class("emoji-pop-header")
 
         self.search_entry = Gtk.SearchEntry()
@@ -154,11 +157,21 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_window_active_changed(self, window, param):
         """Auto-dismiss when clicking outside the window."""
-        if not self.is_active() and self.get_visible() and not self._is_inserting and not self._user_closed:
-            GLib.timeout_add(100, self._handle_outside_click)
+        if self._is_inserting or self._user_closed:
+            return
+        elapsed = GLib.get_monotonic_time() - getattr(self, "_last_insert_time", 0)
+        if elapsed < 1_200_000:
+            return
+        if not self.is_active() and self.get_visible():
+            GLib.timeout_add(120, self._handle_outside_click)
 
     def _handle_outside_click(self) -> bool:
-        if not self.is_active() and self.get_visible() and not self._is_inserting and not self._user_closed:
+        if self._is_inserting or self._user_closed:
+            return False
+        elapsed = GLib.get_monotonic_time() - getattr(self, "_last_insert_time", 0)
+        if elapsed < 1_200_000:
+            return False
+        if not self.is_active() and self.get_visible():
             self.dismiss_window()
         return False
 
@@ -282,30 +295,23 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         # 4. Zero-flicker direct paste into active target window
         self._is_inserting = True
+        self._last_insert_time = GLib.get_monotonic_time()
         close_on_select = self.storage.config.get("close_on_select", False)
 
         if self.focus_manager.is_available:
             # Native COSMIC: Transfer focus directly via zcosmic_toplevel_manager
             # THE WINDOW NEVER UNMAPS, NEVER HIDES, NEVER BLINKS, NEVER FLICKERS!
             self.focus_manager.activate_target()
+            target_app = self.focus_manager.get_target_app_id()
 
             def do_native_paste():
-                self.insertion.simulate_paste()
+                self.insertion.simulate_paste(target_app=target_app)
+                self._is_inserting = False
                 if close_on_select:
                     self.dismiss_window()
-                else:
-                    # After insertion, restore active state to Emoji Pop so
-                    # clicking outside or typing search remains fully responsive
-                    GLib.timeout_add(30, do_finish_native_insert)
                 return False
 
-            def do_finish_native_insert():
-                if not self._user_closed:
-                    self.present()
-                self._is_inserting = False
-                return False
-
-            GLib.timeout_add(20, do_native_paste)
+            GLib.timeout_add(45, do_native_paste)
 
         else:
             # Fallback for non-COSMIC desktop environments where native protocol is unavailable

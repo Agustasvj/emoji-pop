@@ -21,15 +21,15 @@ window.emoji-pop-window {
 
 /* Header container */
 .emoji-pop-header {
-    padding: 10px 12px 6px 12px;
+    padding: 8px 10px 4px 10px;
     border-bottom: 1px solid alpha(@window_fg_color, 0.06);
 }
 
 /* Search entry styling — clean and restrained */
 .emoji-pop-search {
-    border-radius: 10px;
-    font-size: 13.5px;
-    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    padding: 5px 8px;
     background-color: alpha(@window_fg_color, 0.06);
     border: 1px solid alpha(@window_fg_color, 0.08);
     transition: all 120ms ease;
@@ -42,20 +42,21 @@ window.emoji-pop-window {
 }
 
 /* Close button '✕' */
-.close-window-btn {
-    min-width: 28px;
-    min-height: 28px;
+button.close-window-btn {
+    min-width: 24px;
+    min-height: 24px;
     padding: 0;
-    border-radius: 8px;
+    margin: 0;
+    border-radius: 6px;
     border: none;
     background: transparent;
     color: alpha(@window_fg_color, 0.55);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     transition: all 100ms ease;
 }
 
-.close-window-btn:hover {
+button.close-window-btn:hover {
     background-color: alpha(@window_fg_color, 0.10);
     color: @window_fg_color;
 }
@@ -63,33 +64,34 @@ window.emoji-pop-window {
 /* Skin tone bar & circular swatches */
 .skin-tone-bar {
     margin-left: 2px;
-    margin-right: 4px;
+    margin-right: 2px;
 }
 
-.skin-tone-btn {
-    min-width: 22px;
-    min-height: 22px;
-    padding: 3px;
-    border-radius: 11px;
+button.skin-tone-btn {
+    min-width: 16px;
+    min-height: 16px;
+    padding: 1px;
+    margin: 0;
+    border-radius: 8px;
     border: 2px solid transparent;
     background: transparent;
     transition: all 100ms ease;
 }
 
-.skin-tone-btn:hover {
+button.skin-tone-btn:hover {
     background-color: alpha(@window_fg_color, 0.08);
 }
 
-.skin-tone-btn.active {
+button.skin-tone-btn.active {
     border-color: alpha(@window_fg_color, 0.6);
     background-color: alpha(@window_fg_color, 0.12);
 }
 
 /* Color dots inside skin tone buttons */
 .skin-tone-dot {
-    min-width: 12px;
-    min-height: 12px;
-    border-radius: 6px;
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -102,28 +104,29 @@ window.emoji-pop-window {
 
 /* Category navigation bar */
 .category-bar {
-    padding: 6px 10px;
+    padding: 3px 6px;
     border-bottom: 1px solid alpha(@window_fg_color, 0.06);
     background-color: alpha(@window_fg_color, 0.02);
 }
 
-.category-tab-btn {
-    min-width: 32px;
-    min-height: 32px;
-    padding: 4px 6px;
-    border-radius: 8px;
+button.category-tab-btn {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 2px 4px;
+    margin: 0 1px;
+    border-radius: 6px;
     border: none;
     background: transparent;
     font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji";
-    font-size: 16px;
+    font-size: 15px;
     transition: all 100ms ease;
 }
 
-.category-tab-btn:hover {
+button.category-tab-btn:hover {
     background-color: alpha(@window_fg_color, 0.08);
 }
 
-.category-tab-btn.active {
+button.category-tab-btn.active {
     background-color: alpha(@window_fg_color, 0.12);
 }
 
@@ -158,29 +161,30 @@ window.emoji-pop-window {
 }
 
 /* Emoji button item */
-.emoji-item-btn,
-.emoji-item-btn label {
+button.emoji-item-btn,
+button.emoji-item-btn label {
     font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji";
 }
 
-.emoji-item-btn {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 2px;
-    border-radius: 8px;
+button.emoji-item-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    margin: 0;
+    border-radius: 6px;
     border: none;
     background: transparent;
-    font-size: 22px;
+    font-size: 20px;
 }
 
 /* Kaomoji item */
 .kaomoji-item-btn {
-    min-height: 34px;
-    padding: 4px 10px;
-    border-radius: 8px;
+    min-height: 30px;
+    padding: 3px 8px;
+    border-radius: 6px;
     border: 1px solid alpha(@window_fg_color, 0.08);
     background-color: alpha(@window_fg_color, 0.04);
-    font-size: 13.5px;
+    font-size: 13px;
 }
 
 .kaomoji-item-btn:hover {
@@ -189,33 +193,33 @@ window.emoji-pop-window {
 
 /* Empty search state */
 .empty-state-box {
-    padding: 36px 16px;
+    padding: 32px 16px;
 }
 
 .empty-state-icon {
-    font-size: 36px;
-    margin-bottom: 8px;
+    font-size: 32px;
+    margin-bottom: 6px;
     opacity: 0.6;
 }
 
 .empty-state-title {
     font-weight: 600;
-    font-size: 14.5px;
+    font-size: 14px;
     margin-bottom: 4px;
 }
 
 .empty-state-subtitle {
-    font-size: 12.5px;
+    font-size: 12px;
     color: alpha(@window_fg_color, 0.6);
 }
 
 /* Footer status & hint bar */
 .emoji-pop-footer {
-    min-height: 30px;
-    padding: 4px 12px;
+    min-height: 26px;
+    padding: 3px 10px;
     border-top: 1px solid alpha(@window_fg_color, 0.06);
     background-color: alpha(@window_fg_color, 0.02);
-    font-size: 11.5px;
+    font-size: 11px;
     color: alpha(@window_fg_color, 0.60);
 }
 
@@ -226,9 +230,9 @@ window.emoji-pop-window {
 .footer-key-hint {
     background-color: alpha(@window_fg_color, 0.07);
     border-radius: 4px;
-    padding: 2px 5px;
+    padding: 1px 4px;
     margin: 0 2px;
-    font-size: 10px;
+    font-size: 9.5px;
     font-family: monospace;
     font-weight: 600;
 }
