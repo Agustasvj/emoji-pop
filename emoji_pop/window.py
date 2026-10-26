@@ -306,9 +306,17 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
             def do_native_paste():
                 self.insertion.simulate_paste(target_app=target_app)
-                self._is_inserting = False
                 if close_on_select:
+                    self._is_inserting = False
                     self.dismiss_window()
+                else:
+                    GLib.timeout_add(30, do_restore_front)
+                return False
+
+            def do_restore_front():
+                if not self._user_closed:
+                    self.present()
+                self._is_inserting = False
                 return False
 
             GLib.timeout_add(45, do_native_paste)

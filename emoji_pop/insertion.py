@@ -106,7 +106,7 @@ class InsertionBackend:
                 pass
         return None
 
-    def simulate_paste(self, method: Optional[str] = None) -> bool:
+    def simulate_paste(self, method: Optional[str] = None, target_app: Optional[str] = None) -> bool:
         """
         Simulate paste keystroke into the active target application via wtype.
         - Terminal emulators (cosmic-term, alacritty, kitty): sends Ctrl+Shift+V.
@@ -115,11 +115,9 @@ class InsertionBackend:
         if not self._wtype_bin:
             return False
 
-        app_lower = (method or "").lower()
-        if not app_lower and hasattr(self, "paste_method") and self.paste_method:
-            app_lower = self.paste_method.lower()
-
-        is_terminal = any(term in app_lower for term in ("term", "kitty", "alacritty", "console"))
+        target = target_app or method or getattr(self, "paste_method", "") or ""
+        app_lower = target.lower()
+        is_terminal = any(term in app_lower for term in ("term", "kitty", "alacritty", "console", "pty"))
 
         if method == "ctrl_shift_v" or is_terminal:
             args = [self._wtype_bin, "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "ctrl", "-m", "shift"]
