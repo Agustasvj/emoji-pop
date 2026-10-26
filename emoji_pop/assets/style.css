@@ -1,93 +1,105 @@
 /*
- * Emoji Pop — Modern Windows 11 Inspired Styling for Pop!_OS & COSMIC
- * Supports both dark and light modes cleanly with system accent integration.
+ * Emoji Pop — Native COSMIC / Pop!_OS Translucent Frosted Glass Theme
+ * Seamless floating design with soft borders, zero harsh cyan outlines,
+ * and unified aesthetic matching COSMIC desktop applets.
  */
 
-/* Main popup container */
+/* Root window transparency */
 window.emoji-pop-window {
     background-color: transparent;
 }
 
+/* Main card container with frosted glass appearance */
 .emoji-pop-card {
-    background-color: @window_bg_color;
-    border-radius: 14px;
-    border: 1px solid alpha(@window_fg_color, 0.12);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    background-color: rgba(24, 25, 29, 0.90);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.50);
     padding: 0;
-    margin: 6px;
+    margin: 4px;
 }
 
 /* Header container */
 .emoji-pop-header {
-    padding: 10px 12px 6px 12px;
-    border-bottom: 1px solid alpha(@window_fg_color, 0.08);
+    padding: 10px 12px 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* Search entry styling */
+/* Search entry: clean, soft, modern, NO blue outline */
 .emoji-pop-search {
     border-radius: 10px;
     font-size: 13.5px;
     padding: 6px 10px;
-    background-color: alpha(@window_fg_color, 0.05);
-    border: 1px solid alpha(@window_fg_color, 0.08);
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: #F0F0F0;
     transition: all 120ms ease;
+    outline: none;
+    box-shadow: none;
 }
 
+.emoji-pop-search:focus,
 .emoji-pop-search:focus-within {
-    background-color: alpha(@window_fg_color, 0.08);
-    border-color: @accent_color;
-    box-shadow: 0 0 0 2px alpha(@accent_color, 0.25);
+    background-color: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.24);
+    box-shadow: none;
+    outline: none;
 }
 
 /* Close button '✕' */
 .close-window-btn {
-    min-width: 30px;
-    min-height: 30px;
+    min-width: 28px;
+    min-height: 28px;
     padding: 0;
     border-radius: 8px;
     border: none;
     background: transparent;
-    color: alpha(@window_fg_color, 0.6);
+    color: rgba(255, 255, 255, 0.55);
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 500;
     transition: all 100ms ease;
 }
 
 .close-window-btn:hover {
-    background-color: alpha(@window_fg_color, 0.1);
-    color: @window_fg_color;
+    background-color: rgba(255, 255, 255, 0.10);
+    color: #FFFFFF;
 }
 
-/* Skin tone picker button & bar */
+/* Skin tone selector row */
 .skin-tone-bar {
     margin-left: 2px;
     margin-right: 4px;
 }
 
 .skin-tone-btn {
-    min-width: 28px;
-    min-height: 28px;
-    padding: 2px;
-    border-radius: 14px;
+    min-width: 26px;
+    min-height: 26px;
+    padding: 1px;
+    border-radius: 13px;
     border: 1px solid transparent;
     background: transparent;
     font-size: 14px;
+    transition: all 100ms ease;
+    outline: none;
 }
 
 .skin-tone-btn:hover {
-    background-color: alpha(@window_fg_color, 0.1);
+    background-color: rgba(255, 255, 255, 0.09);
 }
 
+/* Active skin tone: soft subtle highlight, NO cyan outline */
 .skin-tone-btn.active {
-    border-color: @accent_color;
-    background-color: alpha(@accent_color, 0.2);
+    border-color: rgba(255, 255, 255, 0.30);
+    background-color: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+    outline: none;
 }
 
-/* Category navigation bar */
+/* Category navigation strip */
 .category-bar {
-    padding: 6px 10px;
-    border-bottom: 1px solid alpha(@window_fg_color, 0.08);
-    background-color: alpha(@window_fg_color, 0.02);
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .category-tab-btn {
@@ -97,20 +109,23 @@ window.emoji-pop-window {
     border-radius: 8px;
     border: none;
     background: transparent;
-    color: alpha(@window_fg_color, 0.75);
-    transition: all 120ms ease;
+    color: rgba(255, 255, 255, 0.70);
+    transition: all 100ms ease;
     font-size: 15px;
+    outline: none;
 }
 
 .category-tab-btn:hover {
-    background-color: alpha(@window_fg_color, 0.08);
-    color: @window_fg_color;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #FFFFFF;
 }
 
+/* Active category tab: soft pill highlight, NO blue outline */
 .category-tab-btn.active {
-    background-color: alpha(@accent_color, 0.18);
-    color: @accent_color;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
     font-weight: bold;
+    outline: none;
 }
 
 /* Scrolled content area */
@@ -130,20 +145,20 @@ window.emoji-pop-window {
     border-radius: 8px;
     background: transparent;
     transition: background 80ms ease;
+    outline: none;
 }
 
 .emoji-flowbox > flowboxchild:hover {
-    background-color: alpha(@window_fg_color, 0.1);
+    background-color: rgba(255, 255, 255, 0.10);
 }
 
 .emoji-flowbox > flowboxchild:selected,
 .emoji-flowbox > flowboxchild:focus {
-    background-color: alpha(@accent_color, 0.2);
-    outline: 2px solid @accent_color;
-    outline-offset: -1px;
+    background-color: rgba(255, 255, 255, 0.16);
+    outline: none;
 }
 
-/* Emoji button item */
+/* Emoji item button */
 .emoji-item-btn {
     min-width: 38px;
     min-height: 38px;
@@ -153,20 +168,27 @@ window.emoji-pop-window {
     background: transparent;
     font-family: "Noto Color Emoji", sans-serif;
     font-size: 22px;
+    outline: none;
 }
 
-/* Kaomoji item */
+.emoji-item-btn:focus {
+    outline: none;
+}
+
+/* Kaomoji item button */
 .kaomoji-item-btn {
     min-height: 34px;
     padding: 4px 10px;
     border-radius: 8px;
-    border: 1px solid alpha(@window_fg_color, 0.08);
-    background-color: alpha(@window_fg_color, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.04);
     font-size: 13.5px;
+    color: #F0F0F0;
+    outline: none;
 }
 
 .kaomoji-item-btn:hover {
-    background-color: alpha(@window_fg_color, 0.12);
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Empty search state */
@@ -177,29 +199,30 @@ window.emoji-pop-window {
 .empty-state-icon {
     font-size: 36px;
     margin-bottom: 8px;
-    opacity: 0.6;
+    opacity: 0.55;
 }
 
 .empty-state-title {
     font-weight: 600;
     font-size: 14.5px;
     margin-bottom: 4px;
+    color: #EEEEEE;
 }
 
 .empty-state-subtitle {
     font-size: 12.5px;
-    color: alpha(@window_fg_color, 0.6);
+    color: rgba(255, 255, 255, 0.55);
 }
 
-/* Footer status & hint bar */
+/* Footer status bar: fixed height, subtle text */
 .emoji-pop-footer {
-    min-height: 30px;
-    max-height: 30px;
-    padding: 4px 12px;
-    border-top: 1px solid alpha(@window_fg_color, 0.08);
-    background-color: alpha(@window_fg_color, 0.02);
-    font-size: 11.5px;
-    color: alpha(@window_fg_color, 0.65);
+    min-height: 28px;
+    max-height: 28px;
+    padding: 3px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.02);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.60);
 }
 
 .footer-status-label {
@@ -207,11 +230,12 @@ window.emoji-pop-window {
 }
 
 .footer-key-hint {
-    background-color: alpha(@window_fg_color, 0.08);
+    background-color: rgba(255, 255, 255, 0.07);
     border-radius: 4px;
-    padding: 2px 5px;
+    padding: 1px 5px;
     margin: 0 2px;
-    font-size: 10.5px;
+    font-size: 10px;
     font-family: monospace;
     font-weight: 600;
+    color: rgba(255, 255, 255, 0.70);
 }

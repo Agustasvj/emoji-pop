@@ -14,7 +14,7 @@ logger = logging.getLogger("emoji_pop.storage")
 DEFAULT_CONFIG: Dict[str, Any] = {
     "shortcut": "Super+period",
     "insertion_mode": "auto",       # "auto", "clipboard_paste" (wl-copy + Ctrl+V), "direct", "copy_only"
-    "close_on_select": False,       # Stay open so user can pick multiple emojis
+    "close_on_select": True,        # Directly insert into active text box on select
     "skin_tone": "",                # "", "\U0001F3FB", etc.
     "max_recent": 40,
     "restore_clipboard": False,

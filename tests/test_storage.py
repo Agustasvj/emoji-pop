@@ -36,7 +36,7 @@ class TestStorageManager(unittest.TestCase):
     def test_default_config(self):
         self.assertEqual(self.storage.config.get("shortcut"), "Super+period")
         self.assertEqual(self.storage.config.get("insertion_mode"), "auto")
-        self.assertFalse(self.storage.config.get("close_on_select"))
+        self.assertTrue(self.storage.config.get("close_on_select"))
 
     def test_recent_addition_and_ordering(self):
         self.storage.clear_recent()

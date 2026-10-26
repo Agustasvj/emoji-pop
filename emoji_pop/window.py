@@ -1,11 +1,11 @@
 """
 Main application window for Emoji Pop.
-Windows 11 inspired floating popup with multi-pick support, auto-dismiss on click outside,
-instant search, and zero-flicker rendering.
+Windows 11 inspired floating popup with native COSMIC frosted glass aesthetic,
+undecorated unified card, direct emoji insertion on click, and auto-dismiss on click outside.
 """
 
 import os
-from typing import Optional, List
+from typing import Optional
 import gi
 
 gi.require_version("Gtk", "4.0")
@@ -24,8 +24,10 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def __init__(self, app: Gtk.Application):
         super().__init__(application=app, title="Emoji Pop")
-        self.set_default_size(380, 470)
+        self.set_default_size(380, 460)
         self.set_resizable(False)
+        # Undecorated window: removes the redundant OS titlebar with "Emoji Pop" and minimize/close buttons
+        self.set_decorated(False)
         self.add_css_class("emoji-pop-window")
 
         self.storage = get_storage()
@@ -39,14 +41,13 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         self._active_category = self.storage.get_last_category()
         self._search_timer_id = 0
         self._base_status_text = ""
-        self._selected_buffer: List[str] = []
-        self._is_dismissing = False
+        self._is_inserting = False
 
-        # Outer card container
+        # Outer card container with frosted glass effect
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         card.add_css_class("emoji-pop-card")
 
-        # 1. Header (Search entry + Skin tone selector + Close button)
+        # 1. Header (Search entry + Skin tone selector + Subtle close button)
         header_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         header_box.add_css_class("emoji-pop-header")
 
@@ -58,12 +59,12 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         self.skin_tone_bar = SkinToneBar(on_tone_changed=self._on_skin_tone_changed)
 
-        # Close button '✕'
+        # Subtle close button '✕'
         close_btn = Gtk.Button(label="✕")
         close_btn.set_tooltip_text("Close (Esc)")
         close_btn.add_css_class("close-window-btn")
         close_btn.set_focus_on_click(False)
-        close_btn.connect("clicked", lambda b: self.close_window(paste_pending=False))
+        close_btn.connect("clicked", lambda b: self.set_visible(False))
 
         header_box.append(self.search_entry)
         header_box.append(self.skin_tone_bar)
@@ -80,7 +81,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         # 4. Footer (Fixed height to prevent any layout jerking/flickering)
         footer_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        footer_box.set_size_request(-1, 30)
+        footer_box.set_size_request(-1, 28)
         footer_box.add_css_class("emoji-pop-footer")
 
         self.status_label = Gtk.Label(label="Emoji Pop")
@@ -126,7 +127,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_window_key_pressed(self, controller, keyval, keycode, state) -> bool:
         if keyval == Gdk.KEY_Escape:
-            self.close_window(paste_pending=False)
+            self.set_visible(False)
             return True
         return False
 
@@ -134,25 +135,17 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         shift_held = bool(state & Gdk.ModifierType.SHIFT_MASK)
 
         if keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
-            # Select top result and close
+            # Select top result and directly insert
             selected = self.grid.select_first(copy_only=shift_held)
-            if selected:
-                self.close_window(paste_pending=not shift_held)
-            return True
+            return selected
         elif keyval == Gdk.KEY_Down:
             return self.grid.focus_first()
         return False
 
     def _on_window_active_changed(self, window, param):
-        """Auto-dismiss when clicking outside the window."""
-        if not self.is_active() and self.get_visible() and not self._is_dismissing:
-            # User clicked outside window -> close and paste accumulated emojis
-            GLib.timeout_add(50, self._handle_outside_click)
-
-    def _handle_outside_click(self) -> bool:
-        if not self.is_active() and self.get_visible() and not self._is_dismissing:
-            self.close_window(paste_pending=True)
-        return False
+        """Auto-dismiss when clicking outside the window without selecting an emoji."""
+        if not self.is_active() and self.get_visible() and not self._is_inserting:
+            self.set_visible(False)
 
     def _on_search_changed(self, entry: Gtk.SearchEntry):
         """Debounced search to ensure snappy typing with zero flicker."""
@@ -246,59 +239,44 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_emoji_selected(self, emoji_char: str, copy_only: bool = False):
         """
-        Handle emoji click.
-        Keeps popup open so user can pick multiple emojis!
-        Copies current pick/accumulation to clipboard immediately.
+        Directly insert selected emoji into the active text box.
+        1. Updates recent history.
+        2. Copies emoji into Wayland clipboard.
+        3. Hides picker window immediately so target application regains focus.
+        4. Simulates Ctrl+V to paste the emoji directly into the active text box.
         """
+        if self._is_inserting:
+            return
+        self._is_inserting = True
+
         # 1. Update recent history
         self.storage.add_recent(emoji_char)
 
-        # 2. Append to selected buffer
-        self._selected_buffer.append(emoji_char)
-        accumulated = "".join(self._selected_buffer)
+        # 2. Put emoji into clipboard with wl-copy
+        self.insertion.copy_to_clipboard(emoji_char)
 
-        # 3. Always copy to clipboard immediately so it's ready in Wayland clipboard
-        self.insertion.copy_to_clipboard(accumulated)
-
-        # 4. Check user preference: close_on_select (default is False now per user request)
-        close_on_select = self.storage.config.get("close_on_select", False)
-        if close_on_select:
-            self.close_window(paste_pending=True)
-            return
-
-        # 5. Keep popup open and update status
-        self._set_status(f"Added {accumulated}  (click more or click outside to paste)")
-
-    def close_window(self, paste_pending: bool = True):
-        """Close window and optionally paste accumulated emojis into target application."""
-        if not self.get_visible() or self._is_dismissing:
-            return
-
-        self._is_dismissing = True
-        accumulated = "".join(self._selected_buffer)
-        self._selected_buffer = []
-
-        # Hide window immediately
+        # 3. Immediately hide window so compositor restores focus to the user's text box
         self.set_visible(False)
 
-        # If there are emojis to paste and paste was requested
-        if paste_pending and accumulated:
-            delay_ms = self.storage.config.get("typing_delay_ms", 60)
+        # 4. If copy_only (Shift held), do not simulate paste
+        if copy_only:
+            self._is_inserting = False
+            return
 
-            def do_paste():
-                # Target window now has focus -> simulate Ctrl+V to paste clean UTF-8 text
-                self.insertion.simulate_paste()
-                self._is_dismissing = False
-                return False
+        # 5. Yield focus to previous active window, then simulate Ctrl+V
+        delay_ms = self.storage.config.get("typing_delay_ms", 60)
 
-            GLib.timeout_add(delay_ms, do_paste)
-        else:
-            self._is_dismissing = False
+        def do_paste():
+            # Focused target application receives Ctrl+V and pastes the emoji directly
+            self.insertion.simulate_paste()
+            self._is_inserting = False
+            return False
+
+        GLib.timeout_add(delay_ms, do_paste)
 
     def present_window(self):
         """Show and focus window when shortcut or command is triggered."""
-        self._selected_buffer = []
-        self._is_dismissing = False
+        self._is_inserting = False
         self.set_visible(True)
         self.present()
         self.search_entry.set_text("")
