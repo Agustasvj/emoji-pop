@@ -3,4 +3,5 @@ __pycache__/
 *.pyo
 *.pyd
 *.bak
+*.so
 .pytest_cache/

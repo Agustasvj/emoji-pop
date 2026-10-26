@@ -17,6 +17,7 @@ from emoji_pop.storage import get_storage
 from emoji_pop.grid import EmojiGrid
 from emoji_pop.categories import CategoryBar, SkinToneBar
 from emoji_pop.insertion import InsertionBackend
+from emoji_pop.focus import CosmicFocusManager
 
 
 class EmojiPopWindow(Gtk.ApplicationWindow):
@@ -33,6 +34,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         self.storage = get_storage()
         self.db = get_emoji_db()
+        self.focus_manager = CosmicFocusManager.get_instance()
         self.insertion = InsertionBackend(
             mode=self.storage.config.get("insertion_mode", "auto"),
             typing_delay_ms=self.storage.config.get("typing_delay_ms", 50),
@@ -252,13 +254,13 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_emoji_selected(self, emoji_char: str, copy_only: bool = False):
         """
-        DIRECT EMOJI INSERTION (MULTI-SELECT ENABLED):
+        ZERO-FLICKER DIRECT EMOJI INSERTION:
         1. Save to recent history.
         2. Copy emoji to both standard clipboard and primary selection.
         3. If copy_only, show status and return.
-        4. Temporarily release Wayland focus to target window.
+        4. Transfer Wayland focus to target window WITHOUT unmapping or hiding the window.
         5. Trigger universal paste (Shift+Insert with Ctrl+V fallback).
-        6. Restore window so user can keep selecting emojis until clicking outside or Esc.
+        6. Emoji Pop stays completely still on screen, open for repeated multi-insertions!
         """
         if self._is_inserting or self._user_closed:
             return
@@ -278,36 +280,64 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
         self.status_label.set_label(f"Inserted {emoji_char}  {name}")
 
-        # 4. Direct paste into active target window
+        # 4. Zero-flicker direct paste into active target window
         self._is_inserting = True
         close_on_select = self.storage.config.get("close_on_select", False)
-        delay_ms = self.storage.config.get("typing_delay_ms", 50)
 
-        # Temporarily hide window so Wayland compositor restores focus to the active target app
-        self.set_visible(False)
+        if self.focus_manager.is_available:
+            # Native COSMIC: Transfer focus directly via zcosmic_toplevel_manager
+            # THE WINDOW NEVER UNMAPS, NEVER HIDES, NEVER BLINKS, NEVER FLICKERS!
+            self.focus_manager.activate_target()
 
-        def do_paste():
-            self.insertion.simulate_paste()
-            if close_on_select:
+            def do_native_paste():
+                self.insertion.simulate_paste()
+                if close_on_select:
+                    self.dismiss_window()
+                else:
+                    # After insertion, restore active state to Emoji Pop so
+                    # clicking outside or typing search remains fully responsive
+                    GLib.timeout_add(30, do_finish_native_insert)
+                return False
+
+            def do_finish_native_insert():
+                if not self._user_closed:
+                    self.present()
                 self._is_inserting = False
-            else:
-                # Restore window so user can continue adding emojis without interruption
-                GLib.timeout_add(45, do_restore)
-            return False
+                return False
 
-        def do_restore():
-            if not self._user_closed:
-                self.set_visible(True)
-                self.present()
-            self._is_inserting = False
-            return False
+            GLib.timeout_add(20, do_native_paste)
 
-        GLib.timeout_add(delay_ms, do_paste)
+        else:
+            # Fallback for non-COSMIC desktop environments where native protocol is unavailable
+            delay_ms = self.storage.config.get("typing_delay_ms", 50)
+            self.set_visible(False)
+
+            def do_fallback_paste():
+                self.insertion.simulate_paste()
+                if close_on_select:
+                    self._is_inserting = False
+                else:
+                    GLib.timeout_add(45, do_fallback_restore)
+                return False
+
+            def do_fallback_restore():
+                if not self._user_closed:
+                    self.set_visible(True)
+                    self.present()
+                self._is_inserting = False
+                return False
+
+            GLib.timeout_add(delay_ms, do_fallback_paste)
 
     def present_window(self):
         """Show and focus window when shortcut or command is triggered."""
         self._user_closed = False
         self._is_inserting = False
+
+        # Capture target application before Emoji Pop takes focus
+        if self.focus_manager.is_available:
+            self.focus_manager.capture_target()
+
         self.set_visible(True)
         self.present()
         self.search_entry.set_text("")

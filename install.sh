@@ -40,6 +40,18 @@ if [ ! -f "${SCRIPT_DIR}/emoji_pop/assets/emoji_data.json.gz" ]; then
     python3 "${SCRIPT_DIR}/scripts/build_data.py"
 fi
 
+# 2b. Build native COSMIC focus helper
+if command -v gcc >/dev/null 2>&1; then
+    echo "Compiling native COSMIC zero-flicker focus manager..."
+    gcc -shared -fPIC -O2 \
+        -I"${SCRIPT_DIR}/emoji_pop/native" \
+        "${SCRIPT_DIR}/emoji_pop/native/cosmic_focus.c" \
+        "${SCRIPT_DIR}/emoji_pop/native/cosmic-toplevel-info-code.c" \
+        "${SCRIPT_DIR}/emoji_pop/native/cosmic-toplevel-management-code.c" \
+        -lwayland-client \
+        -o "${SCRIPT_DIR}/emoji_pop/libcosmic_focus.so" || true
+fi
+
 # 3. Create destination directories
 mkdir -p "${BIN_DIR}" "${APP_DIR}" "${ICON_DIR}" "${PKG_DIR}"
 
