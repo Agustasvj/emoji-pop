@@ -13,22 +13,23 @@ logger = logging.getLogger("emoji_pop.storage")
 
 DEFAULT_CONFIG: Dict[str, Any] = {
     "shortcut": "Super+period",
-    "insertion_mode": "auto",       # "auto", "clipboard_paste" (wl-copy + Ctrl+V), "direct", "copy_only"
-    "close_on_select": True,        # Direct addition closes window on selection
+    "insertion_mode": "auto",       # "auto", "clipboard_paste", "direct", "copy_only"
+    "paste_method": "universal",    # "universal" (Shift+Insert), "ctrl_v", "ctrl_shift_v"
+    "close_on_select": False,       # Keep open for multi-insert until user clicks outside or Esc
     "skin_tone": "",                # "", "\U0001F3FB", etc.
     "max_recent": 40,
     "restore_clipboard": False,
-    "typing_delay_ms": 70,
+    "typing_delay_ms": 50,
     "theme": "system",              # "system", "dark", "light"
 }
 
 DEFAULT_STATE: Dict[str, Any] = {
     "recent": [
-        "😂", "❤️", "👍", "🔥", "✨", "😊", "🎉", "🚀",
+        "😂", "❤️", "👍", "🔥", "✨️", "😊", "🎉", "🚀",
         "😍", "🙏", "🥺", "🥰", "💀", "🤔", "👏", "💯"
     ],
     "favorites": [
-        "❤️", "🔥", "✨", "👍", "🚀"
+        "❤️", "🔥", "✨️", "👍", "🚀"
     ],
     "last_category": "recent",
 }

@@ -43,6 +43,29 @@ class TestInsertionBackend(unittest.TestCase):
         self.assertTrue(ok)
         self.assertIn("clipboard", msg.lower())
 
+    def test_simulate_paste_methods(self):
+        # Test universal Shift+Insert
+        ok_universal = self.backend.simulate_paste("universal")
+        self.assertTrue(ok_universal)
+
+        # Test Ctrl+V fallback
+        ok_ctrl_v = self.backend.simulate_paste("ctrl_v")
+        self.assertTrue(ok_ctrl_v)
+
+    def test_primary_and_regular_clipboard(self):
+        import subprocess
+        test_char = "🚀"
+        ok = self.backend.copy_to_clipboard(test_char)
+        self.assertTrue(ok)
+
+        # Verify regular clipboard
+        proc1 = subprocess.run(["wl-paste"], capture_output=True, text=True, timeout=1.0)
+        self.assertEqual(proc1.stdout.strip(), test_char)
+
+        # Verify primary selection
+        proc2 = subprocess.run(["wl-paste", "--primary"], capture_output=True, text=True, timeout=1.0)
+        self.assertEqual(proc2.stdout.strip(), test_char)
+
 
 if __name__ == "__main__":
     unittest.main()

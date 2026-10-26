@@ -126,8 +126,8 @@ KAOMOJI_LIST = [
     {"text": "(T_T)", "name": "crying", "category": "sad"},
     {"text": "(>_<)", "name": "troubled", "category": "sad"},
     {"text": "ʕ•ᴥ•ʔ", "name": "bear", "category": "animals"},
-    {"text": "(=^･ω･^=)", "name": "cat face", "category": "animals"},
-    {"text": "(=\^·\^=)", "name": "cute cat", "category": "animals"},
+    {"text": r"(=^･ω･^=)", "name": "cat face", "category": "animals"},
+    {"text": r"(=\^·\^=)", "name": "cute cat", "category": "animals"},
     {"text": "(ᵔᴥᵔ)", "name": "happy bear", "category": "animals"},
     {"text": "(♥‿♥)", "name": "love", "category": "love"},
     {"text": "(♡´౪´♡)", "name": "in love", "category": "love"},
@@ -169,11 +169,19 @@ def load_cldr_categories():
                 match = re.match(r"^(\S+)\s+(.+?)(?:\s+<small>\((.*?)\)</small>)?$", line)
                 if match:
                     char, name, kw_str = match.groups()
+
+                    # Normalize BMP emoji characters to include Variation Selector-16 (\uFE0F)
+                    # so they render as full-color graphic emojis instead of monochrome text outlines
+                    if len(char) == 1 and ord(char) < 0x1F000 and not char.endswith("\uFE0F"):
+                        char = char + "\uFE0F"
+
                     keywords = [k.strip() for k in kw_str.split(",")] if kw_str else []
                     
                     # Merge curated aliases
-                    if char in COMMON_ALIASES:
-                        for alias in COMMON_ALIASES[char]:
+                    base_lookup = char.rstrip("\uFE0F")
+                    curated = COMMON_ALIASES.get(char) or COMMON_ALIASES.get(base_lookup)
+                    if curated:
+                        for alias in curated:
                             if alias not in keywords:
                                 keywords.append(alias)
                     
@@ -191,29 +199,26 @@ def load_cldr_categories():
 
 
 def load_skin_tone_metadata():
-    """Load sets of emojis that support skin tone and gender modifications."""
+    """Load sets of emojis that support skin tone modifications."""
     skin_tone_emojis = set()
-    gender_emojis = set()
-    gender_swap_emojis = set()
 
-    if os.path.exists(EMOJI_PICKER_PY):
+    try:
         import sys
-        sys.path.insert(0, "/usr/share/emoji-picker")
-        try:
-            import emoji_data
-            if hasattr(emoji_data, "SKIN_TONE_EMOJIS"):
-                skin_tone_emojis = set(emoji_data.SKIN_TONE_EMOJIS)
-            if hasattr(emoji_data, "GENDER_EMOJIS"):
-                gender_emojis = set(emoji_data.GENDER_EMOJIS)
-            if hasattr(emoji_data, "GENDER_SWAP_EMOJIS"):
-                gender_swap_emojis = set(emoji_data.GENDER_SWAP_EMOJIS)
-        except Exception as e:
-            print("Notice: could not import emoji_data directly:", e)
+        sys.path.insert(0, "/home/sierra/.local/share/pipx/venvs/rofimoji/lib/python3.12/site-packages/picker")
+        import emoji_data
+        if hasattr(emoji_data, "skin_tone_selectable_emojis"):
+            for em in emoji_data.skin_tone_selectable_emojis:
+                # Add both raw and normalized (with FE0F if BMP)
+                skin_tone_emojis.add(em)
+                if len(em) == 1 and ord(em) < 0x1F000:
+                    skin_tone_emojis.add(em + "\uFE0F")
+        elif hasattr(emoji_data, "SKIN_TONE_EMOJIS"):
+            skin_tone_emojis = set(emoji_data.SKIN_TONE_EMOJIS)
+    except Exception as e:
+        print("Notice: could not import emoji_data directly:", e)
 
     return {
         "skin_tone_emojis": sorted(list(skin_tone_emojis)),
-        "gender_emojis": sorted(list(gender_emojis)),
-        "gender_swap_emojis": sorted(list(gender_swap_emojis)),
         "skin_tones": [
             {"code": "", "name": "Default", "sample": "🟡"},
             {"code": "\U0001F3FB", "name": "Light", "sample": "🏻"},

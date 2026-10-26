@@ -185,31 +185,37 @@ class EmojiGrid(Gtk.Box):
         else:
             btn.add_css_class("emoji-item-btn")
 
-        btn.connect("clicked", self._on_button_clicked, item)
+        btn.connect("clicked", self._on_button_clicked)
 
         # Hover detection for status text
         motion = Gtk.EventControllerMotion.new()
-        motion.connect("enter", lambda c, x, y, it=item: self.on_hover(it) if self.on_hover else None)
+        motion.connect("enter", lambda c, x, y, b=btn: self.on_hover(getattr(b, "_emoji_item", None)) if self.on_hover else None)
         motion.connect("leave", lambda c: self.on_hover(None) if self.on_hover else None)
         btn.add_controller(motion)
 
         # Right-click context menu
         click_ctrl = Gtk.GestureClick.new()
         click_ctrl.set_button(Gdk.BUTTON_SECONDARY)
-        click_ctrl.connect("pressed", self._on_item_right_clicked, item, btn)
+        click_ctrl.connect("pressed", lambda g, n, x, y, b=btn: self._on_item_right_clicked(g, n, x, y, b))
         btn.add_controller(click_ctrl)
 
         return btn
 
     def _on_flowbox_child_activated(self, flowbox, child):
         btn = child.get_child()
-        if btn and hasattr(btn, "_emoji_item"):
+        if btn and hasattr(btn, "_emoji_item") and btn._emoji_item:
             self.on_select(btn._emoji_item.char, False)
 
-    def _on_button_clicked(self, btn, item: EmojiItem):
-        self.on_select(item.char, False)
+    def _on_button_clicked(self, btn):
+        item = getattr(btn, "_emoji_item", None)
+        if item:
+            self.on_select(item.char, False)
 
-    def _on_item_right_clicked(self, gesture, n_press, x, y, item: EmojiItem, btn: Gtk.Button):
+    def _on_item_right_clicked(self, gesture, n_press, x, y, btn: Gtk.Button):
+        item = getattr(btn, "_emoji_item", None)
+        if not item:
+            return
+
         popover = Gtk.Popover()
         popover.set_parent(btn)
 
@@ -221,7 +227,7 @@ class EmojiGrid(Gtk.Box):
 
         copy_btn = Gtk.Button(label="📋 Copy to Clipboard")
         copy_btn.set_has_frame(False)
-        copy_btn.connect("clicked", lambda b: (popover.popdown(), self.on_select(item.char, True)))
+        copy_btn.connect("clicked", lambda b, c=item.char: (popover.popdown(), self.on_select(c, True)))
         vbox.append(copy_btn)
 
         storage = get_storage()

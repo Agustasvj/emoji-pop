@@ -93,6 +93,20 @@ class TestEmojiData(unittest.TestCase):
         kaomoji = self.db.get_category_items("kaomoji")
         self.assertGreater(len(kaomoji), 10)
 
+    def test_bmp_emojis_have_fe0f(self):
+        """Verify that BMP symbols that require FE0F for color emoji rendering have it."""
+        coffee = self.db.get_emoji("☕️") or self.db.get_emoji("☕\uFE0F")
+        self.assertIsNotNone(coffee)
+        self.assertTrue(coffee.char.endswith("\uFE0F"))
+
+        star = self.db.get_emoji("⭐️") or self.db.get_emoji("⭐\uFE0F")
+        self.assertIsNotNone(star)
+        self.assertTrue(star.char.endswith("\uFE0F"))
+
+        soccer = self.db.get_emoji("⚽️") or self.db.get_emoji("⚽\uFE0F")
+        self.assertIsNotNone(soccer)
+        self.assertTrue(soccer.char.endswith("\uFE0F"))
+
 
 if __name__ == "__main__":
     unittest.main()

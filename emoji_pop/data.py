@@ -16,16 +16,16 @@ ZWJ = "\u200D"
 
 # Category metadata with human-readable titles and symbolic icon names
 CATEGORY_INFO = [
-    {"id": "recent", "title": "Recently Used", "icon": "document-open-recent-symbolic", "symbol": "🕒"},
-    {"id": "favorites", "title": "Favorites", "icon": "starred-symbolic", "symbol": "⭐"},
+    {"id": "recent", "title": "Recently Used", "icon": "document-open-recent-symbolic", "symbol": "🕒️"},
+    {"id": "favorites", "title": "Favorites", "icon": "starred-symbolic", "symbol": "⭐️"},
     {"id": "smileys_emotion", "title": "Smileys & Emotion", "icon": "face-smile-symbolic", "symbol": "😀"},
     {"id": "people_body", "title": "People & Body", "icon": "avatar-default-symbolic", "symbol": "🧑"},
     {"id": "animals_nature", "title": "Animals & Nature", "icon": "emblem-photos-symbolic", "symbol": "🐱"},
     {"id": "food_drink", "title": "Food & Drink", "icon": "restaurant-symbolic", "symbol": "🍕"},
     {"id": "travel_places", "title": "Travel & Places", "icon": "mark-location-symbolic", "symbol": "🚀"},
-    {"id": "activities", "title": "Activities", "icon": "media-playback-start-symbolic", "symbol": "⚽"},
-    {"id": "objects", "title": "Objects", "icon": "preferences-other-symbolic", "symbol": "💡"},
-    {"id": "symbols", "title": "Symbols", "icon": "dialog-information-symbolic", "symbol": "🔣"},
+    {"id": "activities", "title": "Activities", "icon": "media-playback-start-symbolic", "symbol": "⚽️"},
+    {"id": "objects", "title": "Objects", "icon": "preferences-other-symbolic", "symbol": "💡️"},
+    {"id": "symbols", "title": "Symbols", "icon": "dialog-information-symbolic", "symbol": "🔣️"},
     {"id": "flags", "title": "Flags", "icon": "flag-symbolic", "symbol": "🚩"},
     {"id": "kaomoji", "title": "Kaomoji", "icon": "text-html-symbolic", "symbol": "ʕ•ᴥ•ʔ"},
 ]
@@ -124,11 +124,18 @@ class EmojiDatabase:
                     self._word_index[token] = []
                 self._word_index[token].append(item)
 
+    def is_skin_tone_modifiable(self, emoji_str: str) -> bool:
+        """Check if an emoji character or compound sequence supports skin tones."""
+        if emoji_str in self.skin_tone_emojis:
+            return True
+        base = emoji_str.split(ZWJ)[0].rstrip("\uFE0F")
+        return base in self.skin_tone_emojis
+
     def apply_skin_tone(self, emoji_str: str, tone: str) -> str:
         """Apply Fitzpatrick skin tone modifier to compatible emoji sequence."""
         if not tone:
             return emoji_str
-        if emoji_str not in self.skin_tone_emojis:
+        if not self.is_skin_tone_modifiable(emoji_str):
             return emoji_str
 
         parts = emoji_str.split(ZWJ)
@@ -151,7 +158,7 @@ class EmojiDatabase:
 
         results = []
         for item in items:
-            if item.char in self.skin_tone_emojis:
+            if self.is_skin_tone_modifiable(item.char):
                 modified_char = self.apply_skin_tone(item.char, skin_tone)
                 results.append(EmojiItem(
                     char=modified_char,
@@ -263,7 +270,7 @@ class EmojiDatabase:
 
         results = []
         for _, item in ranked[:limit]:
-            if skin_tone and item.char in self.skin_tone_emojis:
+            if skin_tone and self.is_skin_tone_modifiable(item.char):
                 modified = self.apply_skin_tone(item.char, skin_tone)
                 results.append(EmojiItem(
                     char=modified,

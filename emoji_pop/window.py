@@ -35,14 +35,16 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         self.db = get_emoji_db()
         self.insertion = InsertionBackend(
             mode=self.storage.config.get("insertion_mode", "auto"),
-            typing_delay_ms=self.storage.config.get("typing_delay_ms", 60),
+            typing_delay_ms=self.storage.config.get("typing_delay_ms", 50),
             restore_clipboard=self.storage.config.get("restore_clipboard", False),
+            paste_method=self.storage.config.get("paste_method", "universal"),
         )
 
         self._active_category = self.storage.get_last_category()
         self._search_timer_id = 0
         self._base_status_text = ""
-        self._is_dismissing = False
+        self._is_inserting = False
+        self._user_closed = False
 
         # Outer card container
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -65,7 +67,7 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         close_btn.set_tooltip_text("Close (Esc)")
         close_btn.add_css_class("close-window-btn")
         close_btn.set_focus_on_click(False)
-        close_btn.connect("clicked", lambda b: self.set_visible(False))
+        close_btn.connect("clicked", lambda b: self.dismiss_window())
 
         header_box.append(self.search_entry)
         header_box.append(self.skin_tone_bar)
@@ -126,9 +128,15 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         search_key_ctrl.connect("key-pressed", self._on_search_key_pressed)
         self.search_entry.add_controller(search_key_ctrl)
 
+    def dismiss_window(self):
+        """Cleanly dismiss and hide the popup window."""
+        self._user_closed = True
+        self._is_inserting = False
+        self.set_visible(False)
+
     def _on_window_key_pressed(self, controller, keyval, keycode, state) -> bool:
         if keyval == Gdk.KEY_Escape:
-            self.set_visible(False)
+            self.dismiss_window()
             return True
         return False
 
@@ -144,12 +152,12 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_window_active_changed(self, window, param):
         """Auto-dismiss when clicking outside the window."""
-        if not self.is_active() and self.get_visible() and not self._is_dismissing:
-            GLib.timeout_add(60, self._handle_outside_click)
+        if not self.is_active() and self.get_visible() and not self._is_inserting and not self._user_closed:
+            GLib.timeout_add(100, self._handle_outside_click)
 
     def _handle_outside_click(self) -> bool:
-        if not self.is_active() and self.get_visible() and not self._is_dismissing:
-            self.set_visible(False)
+        if not self.is_active() and self.get_visible() and not self._is_inserting and not self._user_closed:
+            self.dismiss_window()
         return False
 
     def _on_search_changed(self, entry: Gtk.SearchEntry):
@@ -244,44 +252,62 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
 
     def _on_emoji_selected(self, emoji_char: str, copy_only: bool = False):
         """
-        DIRECT EMOJI INSERTION:
+        DIRECT EMOJI INSERTION (MULTI-SELECT ENABLED):
         1. Save to recent history.
-        2. Copy exact UTF-8 emoji to Wayland clipboard.
-        3. Immediately hide the picker window.
-        4. Focus returns to the active text field.
-        5. Simulate Ctrl+V to directly paste the emoji at the cursor!
+        2. Copy emoji to both standard clipboard and primary selection.
+        3. If copy_only, show status and return.
+        4. Temporarily release Wayland focus to target window.
+        5. Trigger universal paste (Shift+Insert with Ctrl+V fallback).
+        6. Restore window so user can keep selecting emojis until clicking outside or Esc.
         """
-        if self._is_dismissing:
+        if self._is_inserting or self._user_closed:
             return
-        self._is_dismissing = True
 
         # 1. Update recent history
         self.storage.add_recent(emoji_char)
 
-        # 2. Always copy to clipboard
+        # 2. Always copy to both standard clipboard and primary selection
         self.insertion.copy_to_clipboard(emoji_char)
 
-        # 3. Hide window immediately so compositor restores focus to the active text box
-        self.set_visible(False)
-
-        # 4. If copy_only requested (e.g. Shift held)
+        # 3. Update footer status label for immediate visual feedback
+        emoji_obj = self.db.get_emoji(emoji_char)
+        name = emoji_obj.name if emoji_obj else ""
         if copy_only:
-            self._is_dismissing = False
+            self.status_label.set_label(f"Copied {emoji_char}  {name} to clipboard")
             return
 
-        # 5. Direct addition: paste into the active text box
-        delay_ms = self.storage.config.get("typing_delay_ms", 70)
+        self.status_label.set_label(f"Inserted {emoji_char}  {name}")
 
-        def do_direct_paste():
+        # 4. Direct paste into active target window
+        self._is_inserting = True
+        close_on_select = self.storage.config.get("close_on_select", False)
+        delay_ms = self.storage.config.get("typing_delay_ms", 50)
+
+        # Temporarily hide window so Wayland compositor restores focus to the active target app
+        self.set_visible(False)
+
+        def do_paste():
             self.insertion.simulate_paste()
-            self._is_dismissing = False
+            if close_on_select:
+                self._is_inserting = False
+            else:
+                # Restore window so user can continue adding emojis without interruption
+                GLib.timeout_add(45, do_restore)
             return False
 
-        GLib.timeout_add(delay_ms, do_direct_paste)
+        def do_restore():
+            if not self._user_closed:
+                self.set_visible(True)
+                self.present()
+            self._is_inserting = False
+            return False
+
+        GLib.timeout_add(delay_ms, do_paste)
 
     def present_window(self):
         """Show and focus window when shortcut or command is triggered."""
-        self._is_dismissing = False
+        self._user_closed = False
+        self._is_inserting = False
         self.set_visible(True)
         self.present()
         self.search_entry.set_text("")

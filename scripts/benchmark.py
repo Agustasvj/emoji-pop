@@ -70,8 +70,8 @@ def measure_warm_invocation():
     """Measure latency to toggle window visibility when daemon is resident in memory."""
     print("[-] Measuring warm invocation / toggle latency (10 iterations)...")
     # Start daemon
-    subprocess.run([str(BIN_PATH), "hide"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(0.5)
+    subprocess.Popen([str(BIN_PATH), "hide"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(0.6)
 
     timings = []
     for i in range(10):
@@ -106,8 +106,8 @@ def measure_memory_and_cpu():
             pass
 
     if not daemon_proc:
-        subprocess.run([str(BIN_PATH), "show"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(0.5)
+        subprocess.Popen([str(BIN_PATH), "show"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(0.6)
         for p in psutil.process_iter(['pid', 'name', 'cmdline']):
             try:
                 cmdline = p.info['cmdline'] or []

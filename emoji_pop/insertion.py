@@ -29,10 +29,11 @@ class InsertionMode(str, Enum):
 class InsertionBackend:
     """Handles inserting emoji into the target application or copying to clipboard."""
 
-    def __init__(self, mode: str = "auto", typing_delay_ms: int = 60, restore_clipboard: bool = False):
+    def __init__(self, mode: str = "auto", typing_delay_ms: int = 50, restore_clipboard: bool = False, paste_method: str = "universal"):
         self.mode = mode
         self.typing_delay_ms = typing_delay_ms
         self.restore_clipboard = restore_clipboard
+        self.paste_method = paste_method
         self._wtype_bin = shutil.which("wtype")
         self._wl_copy_bin = shutil.which("wl-copy")
         self._wl_paste_bin = shutil.which("wl-paste")
@@ -44,8 +45,14 @@ class InsertionBackend:
         return self._wl_copy_bin is not None
 
     def copy_to_clipboard(self, text: str) -> bool:
-        """Copy text to Wayland / system clipboard with robust UTF-8 preservation."""
+        """
+        Copy text to Wayland / system clipboard AND primary selection.
+        Populating both ensures all terminal emulators, X11/Xwayland apps,
+        and Wayland GUI apps have access to the selected emoji.
+        """
+        copied = False
         if self._wl_copy_bin:
+            # Standard clipboard (Ctrl+V, Shift+Insert in GUI apps)
             try:
                 proc = subprocess.run(
                     [self._wl_copy_bin, text],
@@ -55,9 +62,21 @@ class InsertionBackend:
                     timeout=1.0,
                 )
                 if proc.returncode == 0:
-                    return True
+                    copied = True
             except Exception as e:
-                logger.warning("wl-copy failed: %s", e)
+                logger.warning("wl-copy standard clipboard failed: %s", e)
+
+            # Primary selection (terminals, middle-click paste, X11 apps)
+            try:
+                subprocess.run(
+                    [self._wl_copy_bin, "--primary", text],
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=1.0,
+                )
+            except Exception as e:
+                logger.warning("wl-copy primary selection failed: %s", e)
 
         # Fallback to GdkClipboard
         try:
@@ -65,11 +84,11 @@ class InsertionBackend:
             if display:
                 clipboard = display.get_clipboard()
                 clipboard.set(text)
-                return True
+                copied = True
         except Exception as e:
             logger.error("Gdk.Clipboard set failed: %s", e)
 
-        return False
+        return copied
 
     def get_current_clipboard(self) -> Optional[str]:
         """Fetch current clipboard text if available."""
@@ -87,17 +106,45 @@ class InsertionBackend:
                 pass
         return None
 
-    def simulate_paste(self) -> bool:
+    def simulate_paste(self, method: Optional[str] = None) -> bool:
         """
-        Simulate Ctrl+V keystroke via wtype.
-        This instructs the active target application to paste the clipboard contents.
-        Standard keysyms (Ctrl + V) are 100% universally supported across all toolkits.
+        Simulate paste keystroke into the active target application via wtype.
+        - "universal": Types Shift+Insert, which is standard CUA/X11 and works in BOTH
+          terminals (cosmic-term, alacritty, kitty, gnome-terminal) AND GUI apps (gedit,
+          browsers, LibreOffice, electron). Falls back to Ctrl+V if Shift+Insert fails.
+        - "ctrl_v": Types standard Ctrl+V.
+        - "ctrl_shift_v": Types Ctrl+Shift+V for terminals.
         """
         if not self._wtype_bin:
             return False
+
+        target_method = method or self.paste_method or "universal"
+
+        if target_method == "universal":
+            try:
+                proc = subprocess.run(
+                    [self._wtype_bin, "-M", "shift", "-P", "Insert", "-p", "Insert", "-m", "shift"],
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=1.0,
+                )
+                if proc.returncode == 0:
+                    return True
+            except Exception as e:
+                logger.warning("Universal Shift+Insert failed: %s", e)
+
+            # Fallback to Ctrl+V
+            target_method = "ctrl_v"
+
+        if target_method == "ctrl_shift_v":
+            args = [self._wtype_bin, "-M", "ctrl", "-M", "shift", "-k", "v", "-m", "ctrl", "-m", "shift"]
+        else:
+            args = [self._wtype_bin, "-M", "ctrl", "-k", "v", "-m", "ctrl"]
+
         try:
             proc = subprocess.run(
-                [self._wtype_bin, "-M", "ctrl", "-k", "v", "-m", "ctrl"],
+                args,
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,

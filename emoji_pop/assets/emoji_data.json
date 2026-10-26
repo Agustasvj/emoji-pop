@@ -157,6 +157,12 @@
         "category": "smileys_emotion"
       },
       {
+        "char": "🫫",
+        "name": "cracking face",
+        "keywords": [],
+        "category": "smileys_emotion"
+      },
+      {
         "char": "😉",
         "name": "winking face",
         "keywords": [
@@ -965,6 +971,12 @@
         "category": "smileys_emotion"
       },
       {
+        "char": "🫪",
+        "name": "distorted face",
+        "keywords": [],
+        "category": "smileys_emotion"
+      },
+      {
         "char": "🥺",
         "name": "pleading face",
         "keywords": [
@@ -1764,6 +1776,12 @@
         "category": "smileys_emotion"
       },
       {
+        "char": "🫯",
+        "name": "fight cloud",
+        "keywords": [],
+        "category": "smileys_emotion"
+      },
+      {
         "char": "💥",
         "name": "collision",
         "keywords": [
@@ -1912,7 +1930,7 @@
         "category": "people_body"
       },
       {
-        "char": "✋",
+        "char": "✋️",
         "name": "raised hand",
         "keywords": [
           "hand",
@@ -2192,7 +2210,19 @@
         "category": "people_body"
       },
       {
-        "char": "✊",
+        "char": "🫹",
+        "name": "leftwards thumb sign",
+        "keywords": [],
+        "category": "people_body"
+      },
+      {
+        "char": "🫺",
+        "name": "rightwards thumb sign",
+        "keywords": [],
+        "category": "people_body"
+      },
+      {
+        "char": "✊️",
         "name": "raised fist",
         "keywords": [
           "clenched",
@@ -4008,6 +4038,12 @@
       {
         "char": "🧌",
         "name": "troll",
+        "keywords": [],
+        "category": "people_body"
+      },
+      {
+        "char": "🫈",
+        "name": "hairy creature",
         "keywords": [],
         "category": "people_body"
       },
@@ -6126,6 +6162,12 @@
         "category": "animals_nature"
       },
       {
+        "char": "🫍",
+        "name": "orca",
+        "keywords": [],
+        "category": "animals_nature"
+      },
+      {
         "char": "🦭",
         "name": "seal",
         "keywords": [
@@ -6268,6 +6310,12 @@
           "insect",
           "pretty"
         ],
+        "category": "animals_nature"
+      },
+      {
+        "char": "🫌",
+        "name": "monarch butterfly",
+        "keywords": [],
         "category": "animals_nature"
       },
       {
@@ -6956,6 +7004,12 @@
           "pickle",
           "vegetable"
         ],
+        "category": "food_drink"
+      },
+      {
+        "char": "🫝",
+        "name": "pickle",
+        "keywords": [],
         "category": "food_drink"
       },
       {
@@ -7763,7 +7817,7 @@
         "category": "food_drink"
       },
       {
-        "char": "☕",
+        "char": "☕️",
         "name": "hot beverage",
         "keywords": [
           "beverage",
@@ -8148,6 +8202,12 @@
         "category": "travel_places"
       },
       {
+        "char": "🛘",
+        "name": "landslide",
+        "keywords": [],
+        "category": "travel_places"
+      },
+      {
         "char": "🌋",
         "name": "volcano",
         "keywords": [
@@ -8470,7 +8530,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛪",
+        "char": "⛪️",
         "name": "church",
         "keywords": [
           "Christian",
@@ -8534,7 +8594,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛲",
+        "char": "⛲️",
         "name": "fountain",
         "keywords": [
           "fountain"
@@ -8542,7 +8602,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛺",
+        "char": "⛺️",
         "name": "tent",
         "keywords": [
           "camping",
@@ -9115,7 +9175,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛽",
+        "char": "⛽️",
         "name": "fuel pump",
         "keywords": [
           "diesel",
@@ -9187,7 +9247,13 @@
         "category": "travel_places"
       },
       {
-        "char": "⚓",
+        "char": "🛙",
+        "name": "lighthouse",
+        "keywords": [],
+        "category": "travel_places"
+      },
+      {
+        "char": "⚓️",
         "name": "anchor",
         "keywords": [
           "anchor",
@@ -9203,7 +9269,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛵",
+        "char": "⛵️",
         "name": "sailboat",
         "keywords": [
           "boat",
@@ -9428,7 +9494,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⌛",
+        "char": "⌛️",
         "name": "hourglass done",
         "keywords": [
           "hourglass done",
@@ -9438,7 +9504,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⏳",
+        "char": "⏳️",
         "name": "hourglass not done",
         "keywords": [
           "hourglass",
@@ -9449,7 +9515,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⌚",
+        "char": "⌚️",
         "name": "watch",
         "keywords": [
           "clock",
@@ -9458,7 +9524,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⏰",
+        "char": "⏰️",
         "name": "alarm clock",
         "keywords": [
           "alarm",
@@ -9981,7 +10047,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⭐",
+        "char": "⭐️",
         "name": "star",
         "keywords": [
           "star",
@@ -10033,7 +10099,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛅",
+        "char": "⛅️",
         "name": "sun behind cloud",
         "keywords": [
           "cloud",
@@ -10190,7 +10256,7 @@
         "category": "travel_places"
       },
       {
-        "char": "☔",
+        "char": "☔️",
         "name": "umbrella with rain drops",
         "keywords": [
           "clothing",
@@ -10213,7 +10279,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⚡",
+        "char": "⚡️",
         "name": "high voltage",
         "keywords": [
           "danger",
@@ -10246,7 +10312,7 @@
         "category": "travel_places"
       },
       {
-        "char": "⛄",
+        "char": "⛄️",
         "name": "snowman without snow",
         "keywords": [
           "cold",
@@ -10263,6 +10329,12 @@
           "comet",
           "space"
         ],
+        "category": "travel_places"
+      },
+      {
+        "char": "🪋",
+        "name": "meteor",
+        "keywords": [],
         "category": "travel_places"
       },
       {
@@ -10356,7 +10428,7 @@
         "category": "activities"
       },
       {
-        "char": "✨",
+        "char": "✨️",
         "name": "sparkles",
         "keywords": [
           "*",
@@ -10596,7 +10668,7 @@
         "category": "activities"
       },
       {
-        "char": "⚽",
+        "char": "⚽️",
         "name": "soccer ball",
         "keywords": [
           "ball",
@@ -10606,7 +10678,7 @@
         "category": "activities"
       },
       {
-        "char": "⚾",
+        "char": "⚾️",
         "name": "baseball",
         "keywords": [
           "ball",
@@ -10797,7 +10869,7 @@
         "category": "activities"
       },
       {
-        "char": "⛳",
+        "char": "⛳️",
         "name": "flag in hole",
         "keywords": [
           "flag in hole",
@@ -11923,6 +11995,12 @@
         "category": "objects"
       },
       {
+        "char": "🪊",
+        "name": "trombone",
+        "keywords": [],
+        "category": "objects"
+      },
+      {
         "char": "🪗",
         "name": "accordion",
         "keywords": [
@@ -12570,6 +12648,12 @@
         "category": "objects"
       },
       {
+        "char": "🪎",
+        "name": "treasure chest",
+        "keywords": [],
+        "category": "objects"
+      },
+      {
         "char": "💴",
         "name": "yen banknote",
         "keywords": [
@@ -12885,6 +12969,12 @@
         "category": "objects"
       },
       {
+        "char": "🪌",
+        "name": "eraser",
+        "keywords": [],
+        "category": "objects"
+      },
+      {
         "char": "💼",
         "name": "briefcase",
         "keywords": [
@@ -13173,6 +13263,12 @@
           "lock",
           "old"
         ],
+        "category": "objects"
+      },
+      {
+        "char": "🪍",
+        "name": "net with handle",
+        "keywords": [],
         "category": "objects"
       },
       {
@@ -13988,7 +14084,7 @@
         "category": "symbols"
       },
       {
-        "char": "♿",
+        "char": "♿️",
         "name": "wheelchair symbol",
         "keywords": [
           "access",
@@ -14110,7 +14206,7 @@
         "category": "symbols"
       },
       {
-        "char": "⛔",
+        "char": "⛔️",
         "name": "no entry",
         "keywords": [
           "entry",
@@ -14602,7 +14698,7 @@
         "category": "symbols"
       },
       {
-        "char": "♈",
+        "char": "♈️",
         "name": "Aries",
         "keywords": [
           "Aries",
@@ -14612,7 +14708,7 @@
         "category": "symbols"
       },
       {
-        "char": "♉",
+        "char": "♉️",
         "name": "Taurus",
         "keywords": [
           "bull",
@@ -14623,7 +14719,7 @@
         "category": "symbols"
       },
       {
-        "char": "♊",
+        "char": "♊️",
         "name": "Gemini",
         "keywords": [
           "Gemini",
@@ -14633,7 +14729,7 @@
         "category": "symbols"
       },
       {
-        "char": "♋",
+        "char": "♋️",
         "name": "Cancer",
         "keywords": [
           "Cancer",
@@ -14643,7 +14739,7 @@
         "category": "symbols"
       },
       {
-        "char": "♌",
+        "char": "♌️",
         "name": "Leo",
         "keywords": [
           "Leo",
@@ -14653,7 +14749,7 @@
         "category": "symbols"
       },
       {
-        "char": "♍",
+        "char": "♍️",
         "name": "Virgo",
         "keywords": [
           "Virgo",
@@ -14662,7 +14758,7 @@
         "category": "symbols"
       },
       {
-        "char": "♎",
+        "char": "♎️",
         "name": "Libra",
         "keywords": [
           "balance",
@@ -14674,7 +14770,7 @@
         "category": "symbols"
       },
       {
-        "char": "♏",
+        "char": "♏️",
         "name": "Scorpio",
         "keywords": [
           "Scorpio",
@@ -14685,7 +14781,7 @@
         "category": "symbols"
       },
       {
-        "char": "♐",
+        "char": "♐️",
         "name": "Sagittarius",
         "keywords": [
           "archer",
@@ -14695,7 +14791,7 @@
         "category": "symbols"
       },
       {
-        "char": "♑",
+        "char": "♑️",
         "name": "Capricorn",
         "keywords": [
           "Capricorn",
@@ -14705,7 +14801,7 @@
         "category": "symbols"
       },
       {
-        "char": "♒",
+        "char": "♒️",
         "name": "Aquarius",
         "keywords": [
           "Aquarius",
@@ -14716,7 +14812,7 @@
         "category": "symbols"
       },
       {
-        "char": "♓",
+        "char": "♓️",
         "name": "Pisces",
         "keywords": [
           "fish",
@@ -14726,7 +14822,7 @@
         "category": "symbols"
       },
       {
-        "char": "⛎",
+        "char": "⛎️",
         "name": "Ophiuchus",
         "keywords": [
           "bearer",
@@ -14782,7 +14878,7 @@
         "category": "symbols"
       },
       {
-        "char": "⏩",
+        "char": "⏩️",
         "name": "fast-forward button",
         "keywords": [
           "arrow",
@@ -14831,7 +14927,7 @@
         "category": "symbols"
       },
       {
-        "char": "⏪",
+        "char": "⏪️",
         "name": "fast reverse button",
         "keywords": [
           "arrow",
@@ -14865,7 +14961,7 @@
         "category": "symbols"
       },
       {
-        "char": "⏫",
+        "char": "⏫️",
         "name": "fast up button",
         "keywords": [
           "arrow",
@@ -14887,7 +14983,7 @@
         "category": "symbols"
       },
       {
-        "char": "⏬",
+        "char": "⏬️",
         "name": "fast down button",
         "keywords": [
           "arrow",
@@ -15055,7 +15151,7 @@
         "category": "symbols"
       },
       {
-        "char": "➕",
+        "char": "➕️",
         "name": "plus",
         "keywords": [
           "+",
@@ -15066,7 +15162,7 @@
         "category": "symbols"
       },
       {
-        "char": "➖",
+        "char": "➖️",
         "name": "minus",
         "keywords": [
           "-",
@@ -15078,7 +15174,7 @@
         "category": "symbols"
       },
       {
-        "char": "➗",
+        "char": "➗️",
         "name": "divide",
         "keywords": [
           "÷",
@@ -15135,7 +15231,7 @@
         "category": "symbols"
       },
       {
-        "char": "❓",
+        "char": "❓️",
         "name": "red question mark",
         "keywords": [
           "?",
@@ -15146,7 +15242,7 @@
         "category": "symbols"
       },
       {
-        "char": "❔",
+        "char": "❔️",
         "name": "white question mark",
         "keywords": [
           "?",
@@ -15159,7 +15255,7 @@
         "category": "symbols"
       },
       {
-        "char": "❕",
+        "char": "❕️",
         "name": "white exclamation mark",
         "keywords": [
           "!",
@@ -15172,7 +15268,7 @@
         "category": "symbols"
       },
       {
-        "char": "❗",
+        "char": "❗️",
         "name": "red exclamation mark",
         "keywords": [
           "!",
@@ -15276,7 +15372,7 @@
         "category": "symbols"
       },
       {
-        "char": "⭕",
+        "char": "⭕️",
         "name": "hollow red circle",
         "keywords": [
           "circle",
@@ -15288,7 +15384,7 @@
         "category": "symbols"
       },
       {
-        "char": "✅",
+        "char": "✅️",
         "name": "check mark button",
         "keywords": [
           "✓",
@@ -15320,7 +15416,7 @@
         "category": "symbols"
       },
       {
-        "char": "❌",
+        "char": "❌️",
         "name": "cross mark",
         "keywords": [
           "×",
@@ -15334,7 +15430,7 @@
         "category": "symbols"
       },
       {
-        "char": "❎",
+        "char": "❎️",
         "name": "cross mark button",
         "keywords": [
           "×",
@@ -15346,7 +15442,7 @@
         "category": "symbols"
       },
       {
-        "char": "➰",
+        "char": "➰️",
         "name": "curly loop",
         "keywords": [
           "curl",
@@ -15356,7 +15452,7 @@
         "category": "symbols"
       },
       {
-        "char": "➿",
+        "char": "➿️",
         "name": "double curly loop",
         "keywords": [
           "curl",
@@ -16006,7 +16102,7 @@
         "category": "symbols"
       },
       {
-        "char": "⚫",
+        "char": "⚫️",
         "name": "black circle",
         "keywords": [
           "black circle",
@@ -16016,7 +16112,7 @@
         "category": "symbols"
       },
       {
-        "char": "⚪",
+        "char": "⚪️",
         "name": "white circle",
         "keywords": [
           "circle",
@@ -16089,7 +16185,7 @@
         "category": "symbols"
       },
       {
-        "char": "⬛",
+        "char": "⬛️",
         "name": "black large square",
         "keywords": [
           "black large square",
@@ -16099,7 +16195,7 @@
         "category": "symbols"
       },
       {
-        "char": "⬜",
+        "char": "⬜️",
         "name": "white large square",
         "keywords": [
           "geometric",
@@ -16129,7 +16225,7 @@
         "category": "symbols"
       },
       {
-        "char": "◾",
+        "char": "◾️",
         "name": "black medium-small square",
         "keywords": [
           "black medium-small square",
@@ -16139,7 +16235,7 @@
         "category": "symbols"
       },
       {
-        "char": "◽",
+        "char": "◽️",
         "name": "white medium-small square",
         "keywords": [
           "geometric",
@@ -17924,18 +18020,26 @@
   },
   "modifier_meta": {
     "skin_tone_emojis": [
+      "☝",
       "☝️",
+      "⛹",
       "⛹️",
       "✊",
+      "✊️",
       "✋",
+      "✋️",
+      "✌",
       "✌️",
+      "✍",
       "✍️",
       "🎅",
+      "🏂",
       "🏃",
       "🏄",
+      "🏇",
       "🏊",
-      "🏋️",
-      "🏌️",
+      "🏋",
+      "🏌",
       "👂",
       "👃",
       "👆",
@@ -17952,10 +18056,13 @@
       "👦",
       "👧",
       "👨",
-      "👨‍🍼",
       "👩",
-      "👩‍🍼",
+      "👪",
+      "👫",
+      "👬",
+      "👭",
       "👮",
+      "👯",
       "👰",
       "👱",
       "👲",
@@ -17972,10 +18079,13 @@
       "💅",
       "💆",
       "💇",
+      "💏",
+      "💑",
       "💪",
-      "🕵️",
+      "🕴",
+      "🕵",
       "🕺",
-      "🖐️",
+      "🖐",
       "🖕",
       "🖖",
       "🙅",
@@ -18026,30 +18136,6 @@
       "🧎",
       "🧏",
       "🧑",
-      "🧑‍⚕️",
-      "🧑‍⚖️",
-      "🧑‍✈️",
-      "🧑‍🌾",
-      "🧑‍🍳",
-      "🧑‍🍼",
-      "🧑‍🎓",
-      "🧑‍🎤",
-      "🧑‍🎨",
-      "🧑‍🏫",
-      "🧑‍🏭",
-      "🧑‍💻",
-      "🧑‍💼",
-      "🧑‍🔧",
-      "🧑‍🔬",
-      "🧑‍🚀",
-      "🧑‍🚒",
-      "🧑‍🦯",
-      "🧑‍🦰",
-      "🧑‍🦱",
-      "🧑‍🦲",
-      "🧑‍🦳",
-      "🧑‍🦼",
-      "🧑‍🦽",
       "🧒",
       "🧓",
       "🧔",
@@ -18071,10 +18157,10 @@
       "🫳",
       "🫴",
       "🫵",
-      "🫶"
+      "🫶",
+      "🫷",
+      "🫸"
     ],
-    "gender_emojis": [],
-    "gender_swap_emojis": [],
     "skin_tones": [
       {
         "code": "",
@@ -18205,7 +18291,7 @@
       "category": "animals"
     },
     {
-      "text": "(=^･^=)",
+      "text": "(=\\^·\\^=)",
       "name": "cute cat",
       "category": "animals"
     },
