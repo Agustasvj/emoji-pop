@@ -55,7 +55,7 @@ class InsertionBackend:
             # Standard clipboard (Ctrl+V, Shift+Insert in GUI apps)
             try:
                 proc = subprocess.run(
-                    [self._wl_copy_bin, text],
+                    [self._wl_copy_bin, "-n", text],
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
@@ -69,7 +69,7 @@ class InsertionBackend:
             # Primary selection (terminals, middle-click paste, X11 apps)
             try:
                 subprocess.run(
-                    [self._wl_copy_bin, "--primary", text],
+                    [self._wl_copy_bin, "-n", "--primary", text],
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
@@ -78,15 +78,18 @@ class InsertionBackend:
             except Exception as e:
                 logger.warning("wl-copy primary selection failed: %s", e)
 
-        # Fallback to GdkClipboard
-        try:
-            display = Gdk.Display.get_default()
-            if display:
-                clipboard = display.get_clipboard()
-                clipboard.set(text)
-                copied = True
-        except Exception as e:
-            logger.error("Gdk.Clipboard set failed: %s", e)
+        # Fallback to GdkClipboard ONLY if wl-copy is not available.
+        # Calling Gdk.Clipboard.set() when wl-copy succeeded clobbers wl-copy's
+        # selection offer with an incompatible MIME type, causing stale pastes.
+        if not copied:
+            try:
+                display = Gdk.Display.get_default()
+                if display:
+                    clipboard = display.get_clipboard()
+                    clipboard.set(text)
+                    copied = True
+            except Exception as e:
+                logger.error("Gdk.Clipboard set failed: %s", e)
 
         return copied
 
@@ -141,12 +144,15 @@ class InsertionBackend:
             return False
 
     def _type_direct(self, text: str) -> bool:
-        """Type Unicode string directly via wtype (fallback only)."""
+        """
+        Type Unicode string directly via wtype.
+        Strips variation selector FE0F (VS16) so wtype does not inject it as an
+        isolated individual keystroke, which causes tofu box glyphs in target inputs.
+        """
         if not self._wtype_bin:
             return False
         try:
-            # Strip trailing variation selector FE0F if present as wtype turns it into tofu
-            clean_text = text.rstrip("\uFE0F")
+            clean_text = text.replace("\uFE0F", "")
             proc = subprocess.run(
                 [self._wtype_bin, clean_text],
                 stdin=subprocess.DEVNULL,
@@ -158,6 +164,28 @@ class InsertionBackend:
         except Exception as e:
             logger.warning("Direct wtype typing error: %s", e)
             return False
+
+    def type_or_paste(self, emoji_char: str, target_app: Optional[str] = None) -> bool:
+        """
+        Insert emoji into the active target application.
+        Primary: Direct wtype typing with VS16 removal.
+        This completely bypasses Wayland clipboard caching and asynchronous IPC races,
+        guaranteeing the exact clicked emoji is inserted on the very first try without
+        lag or stale repeat insertions.
+        Fallback / Configured: Clipboard paste simulation via simulate_paste().
+        """
+        # If user explicitly requested clipboard paste mode in settings
+        if self.mode == InsertionMode.CLIPBOARD_PASTE:
+            return self.simulate_paste(target_app=target_app)
+
+        # Primary mode (auto or direct): Use direct typing if wtype available
+        if self._wtype_bin:
+            typed = self._type_direct(emoji_char)
+            if typed:
+                return True
+
+        # Fallback to clipboard paste if direct typing is unavailable
+        return self.simulate_paste(target_app=target_app)
 
     def notify_user(self, title: str, message: str):
         """Send desktop notification via notify-send or desktop portal."""
@@ -179,8 +207,7 @@ class InsertionBackend:
         Execute insertion pipeline.
         In AUTO mode:
         1. Copies exact UTF-8 string to Wayland clipboard using wl-copy.
-        2. Simulates Ctrl+V using wtype so the focused application pastes it atomically.
-        3. This guarantees ZERO missing glyph boxes and preserves 100% of Unicode sequences!
+        2. Directly types the exact emoji character into the target app without stale cache races.
         """
         # Step 1: Always copy to clipboard
         copy_ok = self.copy_to_clipboard(emoji_char)
@@ -191,25 +218,15 @@ class InsertionBackend:
                 on_complete(copy_ok, msg)
             return copy_ok, msg
 
-        # Step 2: If DIRECT mode explicitly requested
-        if self.mode == InsertionMode.DIRECT:
-            success = self._type_direct(emoji_char)
-            msg = f"Inserted {emoji_char}" if success else "Copied to clipboard (direct typing failed)"
+        # Step 2: Use type_or_paste
+        success = self.type_or_paste(emoji_char)
+        if success:
+            msg = f"Inserted {emoji_char}"
             if on_complete:
-                on_complete(success, msg)
-            return success, msg
+                on_complete(True, msg)
+            return True, msg
 
-        # Step 3: Default AUTO and CLIPBOARD_PASTE mode
-        # Simulate Ctrl+V to paste the clipboard content into the target window
-        if self._wtype_bin:
-            paste_ok = self.simulate_paste()
-            if paste_ok:
-                msg = f"Inserted {emoji_char}"
-                if on_complete:
-                    on_complete(True, msg)
-                return True, msg
-
-        # Step 4: If wtype paste simulation is not available, clipboard copy is already done
+        # Step 3: Fallback if typing failed but clipboard copy succeeded
         if copy_ok:
             msg = f"Copied {emoji_char} to clipboard (press Ctrl+V to paste)"
             if on_complete:

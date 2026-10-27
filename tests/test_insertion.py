@@ -67,5 +67,22 @@ class TestInsertionBackend(unittest.TestCase):
         self.assertEqual(proc2.stdout.strip(), test_char)
 
 
+    def test_type_or_paste(self):
+        # type_or_paste should succeed with standard emojis and complex sequences
+        ok_wave = self.backend.type_or_paste("👋")
+        self.assertTrue(ok_wave)
+
+        ok_fire = self.backend.type_or_paste("🔥")
+        self.assertTrue(ok_fire)
+
+        # Emoji with FE0F variation selector should also succeed without error
+        ok_fe0f = self.backend.type_or_paste("❤️")
+        self.assertTrue(ok_fe0f)
+
+    def test_type_direct_strips_fe0f(self):
+        ok = self.backend._type_direct("✊\uFE0F")
+        self.assertTrue(ok)
+
+
 if __name__ == "__main__":
     unittest.main()

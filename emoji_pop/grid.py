@@ -88,7 +88,8 @@ class EmojiGrid(Gtk.Box):
         scroll.add_css_class("emoji-scroll-area")
 
         self.search_flowbox = Gtk.FlowBox()
-        self.search_flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+        self.search_flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.search_flowbox.set_activate_on_single_click(False)
         self.search_flowbox.set_valign(Gtk.Align.START)
         self.search_flowbox.set_homogeneous(True)
         self.search_flowbox.set_min_children_per_line(9)
@@ -107,7 +108,8 @@ class EmojiGrid(Gtk.Box):
         scroll.add_css_class("emoji-scroll-area")
 
         flowbox = Gtk.FlowBox()
-        flowbox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+        flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
+        flowbox.set_activate_on_single_click(False)
         flowbox.set_valign(Gtk.Align.START)
         flowbox.add_css_class("emoji-flowbox")
 
