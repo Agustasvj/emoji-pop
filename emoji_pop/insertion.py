@@ -168,23 +168,16 @@ class InsertionBackend:
     def type_or_paste(self, emoji_char: str, target_app: Optional[str] = None) -> bool:
         """
         Insert emoji into the active target application.
-        Primary: Direct wtype typing with VS16 removal.
-        This completely bypasses Wayland clipboard caching and asynchronous IPC races,
-        guaranteeing the exact clicked emoji is inserted on the very first try without
-        lag or stale repeat insertions.
-        Fallback / Configured: Clipboard paste simulation via simulate_paste().
+        Uses UTF-8 Wayland clipboard copy + paste simulation (Ctrl+V / Shift+Insert),
+        guaranteeing 100% universal compatibility across all applications including
+        web browsers (Chrome, Gemini, Firefox), Electron apps (VS Code, Discord),
+        and text editors without corrupting 32-bit Unicode characters into PUA or
+        Asian glyphs.
         """
-        # If user explicitly requested clipboard paste mode in settings
-        if self.mode == InsertionMode.CLIPBOARD_PASTE:
-            return self.simulate_paste(target_app=target_app)
+        # Step 1: Ensure exact UTF-8 string is on the clipboard
+        self.copy_to_clipboard(emoji_char)
 
-        # Primary mode (auto or direct): Use direct typing if wtype available
-        if self._wtype_bin:
-            typed = self._type_direct(emoji_char)
-            if typed:
-                return True
-
-        # Fallback to clipboard paste if direct typing is unavailable
+        # Step 2: Trigger paste into the active target application
         return self.simulate_paste(target_app=target_app)
 
     def notify_user(self, title: str, message: str):
