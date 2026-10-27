@@ -82,7 +82,7 @@ class EmojiPopApplication(Adw.Application):
 
         if subcmd == "hide":
             if self.window and self.window.get_visible():
-                self.window.set_visible(False)
+                self.window.dismiss_window()
             return 0
 
         if subcmd == "show":
@@ -103,7 +103,7 @@ class EmojiPopApplication(Adw.Application):
         if not self.window:
             return
         if self.window.get_visible():
-            self.window.set_visible(False)
+            self.window.dismiss_window()
         else:
             self.window.present_window()
 

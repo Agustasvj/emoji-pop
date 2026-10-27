@@ -175,17 +175,23 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
         return False
 
     def _on_window_active_changed(self, window, param):
-        """Auto-dismiss when clicking outside the window before any emoji is selected."""
+        """Auto-dismiss when clicking outside the window."""
         if self._is_inserting or self._insert_queue or self._user_closed:
             return
-        # If user opened the picker but clicked outside without selecting anything, dismiss cleanly
-        if not self.is_active() and self.get_visible() and getattr(self, "_last_insert_time", 0) == 0:
-            GLib.timeout_add(100, self._handle_outside_click)
+        # If window lost focus during an active insertion or right after, ignore it
+        elapsed = GLib.get_monotonic_time() - getattr(self, "_last_insert_time", 0)
+        if elapsed < 350_000:
+            return
+        if not self.is_active() and self.get_visible():
+            GLib.timeout_add(120, self._handle_outside_click)
 
     def _handle_outside_click(self) -> bool:
         if self._is_inserting or self._insert_queue or self._user_closed:
             return False
-        if not self.is_active() and self.get_visible() and getattr(self, "_last_insert_time", 0) == 0:
+        elapsed = GLib.get_monotonic_time() - getattr(self, "_last_insert_time", 0)
+        if elapsed < 350_000:
+            return False
+        if not self.is_active() and self.get_visible():
             self.dismiss_window()
         return False
 
@@ -332,17 +338,16 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
                     self._insert_queue.clear()
                     self.dismiss_window()
                 else:
-                    # Insertion finished! Target window remains smoothly focused.
-                    # We DO NOT call self.present() — this eliminates 100% of focus
-                    # flickering/blinking, prevents browser instability, and leaves
-                    # Emoji Pop floating smoothly in front for continuous multi-selection.
+                    # Keep Emoji Pop persistent and visible in front for continuous multi-selection!
+                    if not self._user_closed:
+                        self.present()
                     self._is_inserting = False
                     if self._insert_queue:
                         next_char = self._insert_queue.pop(0)
                         GLib.timeout_add(15, lambda: self._process_insertion(next_char))
                 return False
 
-            GLib.timeout_add(25, do_native_insert)
+            GLib.timeout_add(20, do_native_insert)
 
         else:
             # Fallback for non-COSMIC desktop environments where native protocol is unavailable
@@ -356,7 +361,9 @@ class EmojiPopWindow(Gtk.ApplicationWindow):
                     self._insert_queue.clear()
                 else:
                     self._is_inserting = False
-                    self.set_visible(True)
+                    if not self._user_closed:
+                        self.set_visible(True)
+                        self.present()
                     if self._insert_queue:
                         next_char = self._insert_queue.pop(0)
                         GLib.timeout_add(15, lambda: self._process_insertion(next_char))
