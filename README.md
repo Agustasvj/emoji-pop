@@ -44,16 +44,17 @@ sudo apt install python3 python3-gi libgtk-4-1 libadwaita-1-0 wtype wl-clipboard
 Run the included `install.sh` script (does not require root access):
 
 ```bash
-git clone https://github.com/pop-os/emoji-pop.git  # or navigate to directory
-cd emoji
+git clone https://github.com/Agustasvj/emoji-pop.git
+cd emoji-pop
 ./install.sh
 ```
 
 The installer will:
-1. Copy the application to `~/.local/share/emoji-pop`.
-2. Install the `emoji-pop` launcher into `~/.local/bin`.
-3. Install desktop entries and icons into `~/.local/share/applications` and `~/.local/share/icons`.
-4. Automatically register `Super + .` in `~/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom`.
+1. Compile the native COSMIC zero-flicker focus manager (`libcosmic_focus.so`).
+2. Copy the application to `~/.local/share/emoji-pop`.
+3. Install the `emoji-pop` launcher into `~/.local/bin`.
+4. Install desktop entries and icons into `~/.local/share/applications` and `~/.local/share/icons`.
+5. Automatically register `Super + .` in `~/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom`.
 
 ### Uninstallation
 
@@ -71,13 +72,12 @@ Press **`Super + .`** anytime while typing in any application (e.g., COSMIC Term
 
 ### Multi-Emoji Picking (Windows 11 Workflow)
 
-1. Press `Super + .` to open Emoji Pop.
-2. Click any emoji (e.g. ✋) or type to search and click.
-3. The popup **stays open** so you can click more emojis (e.g. ✊, 🚀, 🔥).
+1. Press **`Super + .`** to open Emoji Pop.
+2. Click any emoji (e.g. 👋) or type to search and click. It is **immediately inserted** into your active text box.
+3. The popup **stays open** seamlessly in front so you can keep clicking more emojis (e.g. ✊, 🚀, 🔥).
 4. When you are done:
-   - **Click back into your document** (click outside the popup) -> Emoji Pop closes and automatically inserts all selected emojis!
-   - OR press **Enter** to insert immediately and close.
-   - OR click the **✕** close button or press **Escape** to cancel.
+   - **Click back into your document** (or anywhere outside the popup) to dismiss it.
+   - OR press **Escape** (or click the **✕** button) to close.
 
 ### Keyboard Shortcuts
 
